@@ -3,7 +3,9 @@
 void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int bufferSize, std::vector<Text>::iterator itr) {
 	if (itr != Vector.end()) {
 		if (Vector[std::distance(Vector.begin(), itr)].ENG.size() <= (size_t)bufferSize) {
-			memcpy(dst, Vector[std::distance(Vector.begin(), itr)].ENG.c_str(), Vector[std::distance(Vector.begin(), itr)].ENG.size());
+			memcpy(dst, 
+			       Vector[std::distance(Vector.begin(), itr)].ENG.c_str(),
+			       Vector[std::distance(Vector.begin(), itr)].ENG.size());
 			return;
 		}
 	}
@@ -22,37 +24,35 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 		std::string compareJPN = checkJPN;
 		free(checkJPN);
 
-		auto itrLogic = std::find_if(Logic.begin(), Logic.end(), find_JPN(compareJPN));
-
-		return ReplaceSJIStoUTF8(Logic, src, dst, bufferSize, itrLogic);
+		return ReplaceSJIStoUTF8(Logic, src, dst, bufferSize,
+					std::find_if(Logic.begin(), Logic.end(), find_JPN(compareJPN)));
 	}
 	else if (std::find(TreeOffsets.begin(), TreeOffsets.end(), offset) != TreeOffsets.end()) {
-		auto itr = std::find(TreeOffsets.begin(), TreeOffsets.end(), offset);
-		auto offsetItr = std::distance(TreeOffsets.begin(), itr);
+		auto offsetItr = std::distance(TreeOffsets.begin(),
+					      std::find(TreeOffsets.begin(), TreeOffsets.end(), offset));
 
 		char* checkJPN = (char*)calloc(1, bufferSize);
 		SJIStoUTF8_original(src, bufferSize, checkJPN);
 		std::string compareJPN = checkJPN;
 		free(checkJPN);
 
-		std::vector<Text>::iterator itrTree;
 		switch(offsetItr) {
 			case 0:
 			case 4:
-				itrTree = std::find_if(Tree2C.begin(), Tree2C.end(), find_JPN(compareJPN));
-				ReplaceSJIStoUTF8(Tree2C, src, dst, bufferSize, itrTree);
+				ReplaceSJIStoUTF8(Tree2C, src, dst, bufferSize, 
+						 std::find_if(Tree2C.begin(), Tree2C.end(), find_JPN(compareJPN)));
 				break;
 			case 1:
-				itrTree = std::find_if(Tree4C.begin(), Tree4C.end(), find_JPN(compareJPN));
-				ReplaceSJIStoUTF8(Tree4C, src, dst, bufferSize, itrTree);
+				ReplaceSJIStoUTF8(Tree4C, src, dst, bufferSize,
+						 std::find_if(Tree4C.begin(), Tree4C.end(), find_JPN(compareJPN)));
 				break;
 			case 2:
-				itrTree = std::find_if(Tree8C.begin(), Tree8C.end(), find_JPN(compareJPN));
-				ReplaceSJIStoUTF8(Tree8C, src, dst, bufferSize, itrTree);
+				ReplaceSJIStoUTF8(Tree8C, src, dst, bufferSize,
+						 std::find_if(Tree8C.begin(), Tree8C.end(), find_JPN(compareJPN)));
 				break;
 			case 3:
-				itrTree = std::find_if(TreeCC.begin(), TreeCC.end(), find_JPN(compareJPN));
-				ReplaceSJIStoUTF8(TreeCC, src, dst, bufferSize, itrTree);
+				ReplaceSJIStoUTF8(TreeCC, src, dst, bufferSize,
+						 std::find_if(TreeCC.begin(), TreeCC.end(), find_JPN(compareJPN)));
 				break;
 			default:
 				SJIStoUTF8_original(src, bufferSize, dst);
