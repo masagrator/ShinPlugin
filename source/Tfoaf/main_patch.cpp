@@ -13,7 +13,7 @@ void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int
 void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 	uintptr_t LR = (uintptr_t)__builtin_return_address(0);
 
-	uintptr_t offset = LR - NRO_Tfoaf1_start;
+	ptrdiff_t offset = LR - NRO_Tfoaf1_start;
 
 	if (offset == LogicOffset) {
 		char* checkJPN = (char*)calloc(1, bufferSize);

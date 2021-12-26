@@ -8,7 +8,7 @@ struct Text {
 };
 
 
-std::vector<uintptr_t> TreeOffsets = {
+std::vector<ptrdiff_t> TreeOffsets = {
     0x31cec, //0x2C
     0x31ed0, //0x4C
     0x31f2c, //0x8C

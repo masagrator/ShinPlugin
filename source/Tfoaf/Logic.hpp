@@ -3,7 +3,7 @@
 #include <vector>
 #include "Tree.hpp"
 
-uintptr_t LogicOffset = 0x16810;
+ptrdiff_t LogicOffset = 0x16810;
 
 std::vector<Text> Logic = {
     {"空欄のまま保留", "TEST1"},
