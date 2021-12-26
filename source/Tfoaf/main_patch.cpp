@@ -62,12 +62,12 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 }
 
 uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* string1, const char* string2) {
-	if (strcmp(string1, "\x00") != 0) {
+	if (strncmp(string1, "\x00", 1) != 0) {
 		std::string compare1 = string1;
 		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare1));
 		if (itr1 != YesNo.end()) string1 = YesNo[std::distance(YesNo.begin(), itr1)].ENG.c_str();
 	}
-	if (strcmp(string2, "\x00") != 0) {
+	if (strncmp(string2, "\x00", 1) != 0) {
 		std::string compare2 = string2;
 		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare2));
 		if (itr2 != YesNo.end()) string2 = YesNo[std::distance(YesNo.begin(), itr2)].ENG.c_str();
