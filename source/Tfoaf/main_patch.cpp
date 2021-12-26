@@ -1,30 +1,15 @@
-#include "skyline/inlinehook/And64InlineHook.hpp"
-#include "skyline/utils/cpputils.hpp"
-#include <vector>
-#include <string>
-#include <algorithm>
-#include "nn/ro.h"
-#include "Tree.hpp"
-#include "Logic.hpp"
-#define LINKABLE __attribute__ ((weak))
+#include "main_patch.hpp"
 
-struct find_JPN {
-	std::string JPN;
-	find_JPN(std::string JPN) : JPN(JPN) {}
-	bool operator () ( const Text& m ) const
-	{
-		return m.JPN == JPN;
+void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int bufferSize, std::vector<Text>::iterator itr) {
+	if (itr != Vector.end()) {
+		if (Vector[std::distance(Vector.begin(), itr)].ENG.size() <= (size_t)bufferSize) {
+			memcpy(dst, Vector[std::distance(Vector.begin(), itr)].ENG.c_str(), Vector[std::distance(Vector.begin(), itr)].ENG.size());
+			return;
+		}
 	}
-};
+	return SJIStoUTF8_original(src, bufferSize, dst);
+}
 
-uintptr_t NRO_Tfoaf1_start = 0;
-Result nn::ro::LoadModule(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) LINKABLE;
-Result nn::ro::LookupModuleSymbol(uintptr_t* pOutAddress, const Module* pModule, const char* name) LINKABLE;
-
-
-void (*UTF8toSJIS_NX)(char const* src, int bufferSize, char* dst);
-
-void (*SJIStoUTF8_original)(char const* src, int bufferSize, char* dst);
 void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 	uintptr_t LR = (uintptr_t)__builtin_return_address(0);
 
@@ -39,14 +24,7 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 
 		auto itrLogic = std::find_if(Logic.begin(), Logic.end(), find_JPN(compareJPN));
 
-		if (itrLogic != Logic.end()) {
-			char* newText = (char*)calloc(1, bufferSize);
-			UTF8toSJIS_NX(Logic[std::distance(Logic.begin(), itrLogic)].ENG.c_str(), bufferSize, newText);
-			SJIStoUTF8_original(newText, bufferSize, dst);
-			free(newText);
-			return;
-		}
-		else return SJIStoUTF8_original(src, bufferSize, dst);
+		return ReplaceSJIStoUTF8(Logic, src, dst, bufferSize, itrLogic);
 	}
 	else if (std::find(TreeOffsets.begin(), TreeOffsets.end(), offset) != TreeOffsets.end()) {
 		auto itr = std::find(TreeOffsets.begin(), TreeOffsets.end(), offset);
@@ -57,58 +35,35 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 		std::string compareJPN = checkJPN;
 		free(checkJPN);
 
-		char* newText = (char*)calloc(1, bufferSize);
-		std::vector<Text>::iterator itrText;
+		std::vector<Text>::iterator itrTree;
 		switch(offsetItr) {
 			case 0:
 			case 4:
-				itrText = std::find_if(Tree2C.begin(), Tree2C.end(), find_JPN(compareJPN));
-				if (itrText != Tree2C.end()) {
-					UTF8toSJIS_NX(Tree2C[std::distance(Tree2C.begin(), itrText)].ENG.c_str(), bufferSize, newText);
-					SJIStoUTF8_original(newText, bufferSize, dst);
-					return;
-				}
-				else SJIStoUTF8_original(src, bufferSize, dst);
+				itrTree = std::find_if(Tree2C.begin(), Tree2C.end(), find_JPN(compareJPN));
+				ReplaceSJIStoUTF8(Tree2C, src, dst, bufferSize, itrTree);
 				break;
 			case 1:
-				itrText = std::find_if(Tree4C.begin(), Tree4C.end(), find_JPN(compareJPN));
-				if (itrText != Tree4C.end()) {
-					UTF8toSJIS_NX(Tree4C[std::distance(Tree4C.begin(), itrText)].ENG.c_str(), bufferSize, newText);
-					SJIStoUTF8_original(newText, bufferSize, dst);
-					return;
-				}
-				else SJIStoUTF8_original(src, bufferSize, dst);
+				itrTree = std::find_if(Tree4C.begin(), Tree4C.end(), find_JPN(compareJPN));
+				ReplaceSJIStoUTF8(Tree4C, src, dst, bufferSize, itrTree);
 				break;
 			case 2:
-				itrText = std::find_if(Tree8C.begin(), Tree8C.end(), find_JPN(compareJPN));
-				if (itrText != Tree8C.end()) {
-					UTF8toSJIS_NX(Tree8C[std::distance(Tree8C.begin(), itrText)].ENG.c_str(), bufferSize, newText);
-					SJIStoUTF8_original(newText, bufferSize, dst);
-					return;
-				}
-				else SJIStoUTF8_original(src, bufferSize, dst);
+				itrTree = std::find_if(Tree8C.begin(), Tree8C.end(), find_JPN(compareJPN));
+				ReplaceSJIStoUTF8(Tree8C, src, dst, bufferSize, itrTree);
 				break;
 			case 3:
-				itrText = std::find_if(TreeCC.begin(), TreeCC.end(), find_JPN(compareJPN));
-				if (itrText != TreeCC.end()) {
-					UTF8toSJIS_NX(TreeCC[std::distance(TreeCC.begin(), itrText)].ENG.c_str(), bufferSize, newText);
-					SJIStoUTF8_original(newText, bufferSize, dst);
-					return;
-				}
-				else SJIStoUTF8_original(src, bufferSize, dst);
+				itrTree = std::find_if(TreeCC.begin(), TreeCC.end(), find_JPN(compareJPN));
+				ReplaceSJIStoUTF8(TreeCC, src, dst, bufferSize, itrTree);
 				break;
 			default:
 				SJIStoUTF8_original(src, bufferSize, dst);
 				break;
 		}
-		free(newText);
 		return;
 
 	}
 	else return SJIStoUTF8_original(src, bufferSize, dst);
 }
 
-Result (*LoadModule_original)(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag);
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
@@ -121,6 +76,7 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(SJIStoUTF8_hook),
 			(void**)&SJIStoUTF8_original);
+		
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 		NRO_Tfoaf1_start = pointer - 0x7000;
 	}
