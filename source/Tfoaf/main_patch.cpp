@@ -1,13 +1,10 @@
 #include "main_patch.hpp"
 
 void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int bufferSize, std::vector<Text>::iterator itr) {
-	if (itr != Vector.end()) {
-		if (Vector[std::distance(Vector.begin(), itr)].ENG.size() <= (size_t)bufferSize) {
-			memcpy(dst, 
-			       Vector[std::distance(Vector.begin(), itr)].ENG.c_str(),
-			       Vector[std::distance(Vector.begin(), itr)].ENG.size());
-			return;
-		}
+	if (itr != Vector.end() && Vector[std::distance(Vector.begin(), itr)].ENG.size() <= (size_t)bufferSize) {
+		memcpy(dst, Vector[std::distance(Vector.begin(), itr)].ENG.c_str(),
+		       Vector[std::distance(Vector.begin(), itr)].ENG.size());
+		return;
 	}
 	return SJIStoUTF8_original(src, bufferSize, dst);
 }
