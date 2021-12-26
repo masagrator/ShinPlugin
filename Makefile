@@ -11,6 +11,9 @@ all: skyline
 
 skyline:
 	$(MAKE) all -f $(MAKE_NSO) MAKE_NSO=$(MAKE_NSO) BUILD=$(BUILD_DIR) TARGET=$(NAME)
+	mkdir -p 010005F00E036000/exefs
+	cp subsdk9 010005F00E036000/exefs/subsdk9
+	cp main.npdm 010005F00E036000/exefs/main.npdm
 
 clean:
 	$(MAKE) clean -f $(MAKE_NSO)
