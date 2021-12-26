@@ -61,14 +61,27 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 	else return SJIStoUTF8_original(src, bufferSize, dst);
 }
 
+uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* string1, const char* string2) {
+	if (strcmp(string1, "\x00") != 0) {
+		std::string compare1 = string1;
+		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare1));
+		if (itr1 != YesNo.end()) string1 = YesNo[std::distance(YesNo.begin(), itr1)].ENG.c_str();
+	}
+	if (strcmp(string2, "\x00") != 0) {
+		std::string compare2 = string2;
+		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare2));
+		if (itr2 != YesNo.end()) string2 = YesNo[std::distance(YesNo.begin(), itr2)].ENG.c_str();
+	}
+	return Wins_YesNoWindow_Set_original(unk0, unk1, unk2, string1, string2);
+}
+
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
-		uintptr_t UTF8toSJIS_PTR = 0;
-		nn::ro::LookupModuleSymbol(&UTF8toSJIS_PTR, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
-		memcpy((void**)&UTF8toSJIS_NX, &UTF8toSJIS_PTR, 8);
-	
 		uintptr_t pointer = 0;
+		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
+		memcpy((void**)&UTF8toSJIS_NX, &pointer, 8);
+	
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13SJIStoUTF8_NXPKciPc");
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(SJIStoUTF8_hook),
@@ -76,6 +89,11 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 		
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 		NRO_Tfoaf1_start = pointer - 0x7000;
+
+		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
+		A64HookFunction((void*)pointer,
+			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
+			(void**)&Wins_YesNoWindow_Set_original);
 	}
 	return ret;
 }
