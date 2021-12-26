@@ -30,11 +30,11 @@ INCLUDES	:=	include
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv8-a+crc+fp+simd -mtune=cortex-a57 -mtp=soft -fPIC -mcpu=cortex-a57+crc+fp+simd -ftls-model=local-exec
+ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 
 # change to O3 or even Ofast if nothing breaks for final release
 # also try enabling LTO to get max perf
-CFLAGS	:=	-g -Ofast -flto -Wall -Wno-multichar -ffunction-sections \
+CFLAGS	:=	-g -O3 -flto -Wall -Wno-multichar -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DNOLOG
