@@ -10,13 +10,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    container: devkitpro/devkita64
     steps:
     - uses: actions/checkout@v2
-    - name: toolchain setup
-      run: docker pull devkitpro/toolchain-base
-    - name: devkitarm setup
-      run: docker pull devkitpro/devkita64_devkitarm
     - name: make
       run: make
     - name: zip
