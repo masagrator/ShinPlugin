@@ -75,6 +75,25 @@ uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* str
 	return Wins_YesNoWindow_Set_original(unk0, unk1, unk2, string1, string2);
 }
 
+void patchTfoaf1Code() {
+	// Patches for reversing YES NO
+	uint8_t reverseYesNoResult_code[4] = {0x1F, 0x01, 0x00, 0x71};
+	uint8_t reverseCancelOK_YesNoSounds_code[4] = {0x15, 0x09, 0x00, 0x35};
+	uint8_t notInterpretBackAsYes_code[4] = {0xE0, 0x2E, 0x00, 0x79};
+	ptrdiff_t reverseYesNoResult_ptr = 0x559E0;
+	ptrdiff_t reverseCancelOK_YesNoSounds_ptr = 0x54608;
+	ptrdiff_t notInterpretBackAsYes_ptr = 0x54720;
+
+	sky_memcpy((void*)(NRO_Tfoaf1_start + reverseYesNoResult_ptr), 
+					&reverseYesNoResult_code, 4);
+	sky_memcpy((void*)(NRO_Tfoaf1_start + reverseCancelOK_YesNoSounds_ptr), 
+					&reverseCancelOK_YesNoSounds_code, 4);
+	sky_memcpy((void*)(NRO_Tfoaf1_start + notInterpretBackAsYes_ptr), 
+					&notInterpretBackAsYes_code, 4);
+
+	return;
+}
+
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
@@ -89,16 +108,18 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(SJIStoUTF8_hook),
 			(void**)&SJIStoUTF8_original);
-		
-		// Find symbol to determine NRO start pointer
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
-		NRO_Tfoaf1_start = pointer - 0x7000;
 
 		// Hook Yes/No Window to replace hardcoded text
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
 			(void**)&Wins_YesNoWindow_Set_original);
+		
+		// Find symbol to determine NRO start pointer
+		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
+		NRO_Tfoaf1_start = pointer - 0x7000;
+		patchTfoaf1Code();
+		
 	}
 	return ret;
 }

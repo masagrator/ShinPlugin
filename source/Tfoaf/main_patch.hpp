@@ -2,6 +2,7 @@
 
 #include "skyline/inlinehook/And64InlineHook.hpp"
 #include "skyline/utils/cpputils.hpp"
+#include "skyline/inlinehook/memcpy_controlled.hpp"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -23,6 +24,8 @@ struct find_JPN {
 		return m.JPN == JPN;
 	}
 };
+
+
 
 uintptr_t NRO_Tfoaf1_start = 0;
 uintptr_t notDuospaced = false;
