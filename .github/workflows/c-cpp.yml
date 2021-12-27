@@ -15,9 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: make
       run: make
-    - name: zip
-      run: sudo apt install zip && zip -r Plugin.zip 010005F00E036000
     - uses: actions/upload-artifact@v2
       with:
         name: Plugin
-        path: Plugin.zip
+        path: 010005F00E036000
