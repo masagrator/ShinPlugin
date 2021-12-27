@@ -21,7 +21,6 @@ jobs:
       run: make
     - name: zip
       run: sudo apt install zip && zip -r Plugin.zip 010005F00E036000
-    - name: release
     - uses: actions/upload-artifact@v2
       with:
         name: Plugin
