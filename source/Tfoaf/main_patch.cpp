@@ -78,6 +78,9 @@ uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* str
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
+
+		/* Hook two functions responsible for converting text between encodings
+		to replace text in certain parts of games on the fly.*/
 		uintptr_t pointer = 0;
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
 		memcpy((void**)&UTF8toSJIS_NX, &pointer, 8);
@@ -87,9 +90,11 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 			reinterpret_cast<void*>(SJIStoUTF8_hook),
 			(void**)&SJIStoUTF8_original);
 		
+		// Find symbol to determine NRO start pointer
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 		NRO_Tfoaf1_start = pointer - 0x7000;
 
+		// Hook Yes/No Window to replace hardcoded text
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
@@ -98,9 +103,25 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 	return ret;
 }
 
+
+void CMojiFontDraw_hook(void* fontPtr, void* unk1, void* unk2) {
+
+	CMojiFontDraw_original(fontPtr, unk1, unk2);
+
+	notDuospaced = true;
+	memcpy((void*)((uintptr_t)fontPtr+38), &notDuospaced, 1);
+	return;
+}
+
 void tfoaf_main()
 {
+	//Hook NRO loading
 	A64HookFunction((void**)&nn::ro::LoadModule,
 			reinterpret_cast<void*>(LoadModule_hook),
 			(void**)&LoadModule_original);
+
+	//Hook Font Generation
+	A64HookFunction((void**)&_ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE,
+			reinterpret_cast<void*>(CMojiFontDraw_hook),
+			(void**)&CMojiFontDraw_original);
 }
