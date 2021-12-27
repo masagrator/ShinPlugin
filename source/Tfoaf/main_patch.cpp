@@ -99,12 +99,13 @@ void patchTfoaf1Code() {
 	uint8_t reverseYesNoResult_code[4] = {0x1F, 0x01, 0x00, 0x71};
 	uint8_t reverseCancelOK_YesNoSounds_code[4] = {0x15, 0x09, 0x00, 0x35};
 	uint8_t notInterpretBackAsYes_code[4] = {0xE0, 0x2E, 0x00, 0x79};
-	// Patch that removes option to write user name instead of true MC name
-	uint8_t nopUserName_code[4] = {0x1F, 0x20, 0x03, 0xD5};
 
 	ptrdiff_t reverseYesNoResult_ptr = 0x559E0;
 	ptrdiff_t reverseCancelOK_YesNoSounds_ptr = 0x54608;
 	ptrdiff_t notInterpretBackAsYes_ptr = 0x54720;
+	// Patch that removes option to write user name instead of true MC name
+	uint8_t nopUserName_code[4] = {0x1F, 0x20, 0x03, 0xD5};
+
 	ptrdiff_t nopUserNameMainWindow_ptr = 0x536E0;
 	ptrdiff_t nopUserNameBacklog_ptr = 0x53CBC;
 
@@ -127,7 +128,7 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
 
 		/* Hook two functions responsible for converting text between encodings
-		to replace text in certain parts of games on the fly.*/
+		to replace text in certain parts of game on the fly.*/
 		uintptr_t pointer = 0;
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
 		memcpy((void**)&UTF8toSJIS_NX, &pointer, 8);
@@ -143,7 +144,7 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
 			(void**)&Wins_YesNoWindow_Set_original);
 		
-		// Hook DrawText
+		// Hook DrawText to repair issue with rendering separated parts of text in one line
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z8DrawTextiiijPKcffi");
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(DrawText_hook),
