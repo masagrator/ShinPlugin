@@ -75,15 +75,23 @@ uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* str
 	return Wins_YesNoWindow_Set_original(unk0, unk1, unk2, string1, string2);
 }
 
-uint64_t DrawText_hook(int w0, int w1, int w2, unsigned int w3, float s0, float s1, char const* Text, int w4) {
+uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float ScaleX, float ScaleY, char const* Text, int w4) {
 	uintptr_t LR = (uintptr_t)__builtin_return_address(0);
 
 	ptrdiff_t offset = LR - NRO_Tfoaf1_start;
 
 	if (std::find(NMSTextOffsets.begin(), NMSTextOffsets.end(), offset) != NMSTextOffsets.end()) {
-		return DrawText_original(w0, w1, w2, w3, s0, s1, Text, w4);
+		static int Old_X = 0;
+		static int Old_Y = 0;
+		static int64_t OldText_width = 0;
+		if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
+			Pos_X = Old_X + OldText_width;
+		}
+		OldText_width = _Z16getDrawTextWidthPKcf(Text, ScaleX);
+		Old_X = Pos_X;
+		Old_Y = Pos_Y;
 	}
-	return DrawText_original(w0, w1, w2, w3, s0, s1, Text, w4);
+	return DrawText_original(Pos_X, Pos_Y, Pos_Z, w3, ScaleX, ScaleY, Text, w4);
 }
 
 void patchTfoaf1Code() {
