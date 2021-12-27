@@ -75,6 +75,17 @@ uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* str
 	return Wins_YesNoWindow_Set_original(unk0, unk1, unk2, string1, string2);
 }
 
+uint64_t DrawText_hook(int w0, int w1, int w2, unsigned int w3, float s0, float s1, char const* Text, int w4) {
+	uintptr_t LR = (uintptr_t)__builtin_return_address(0);
+
+	ptrdiff_t offset = LR - NRO_Tfoaf1_start;
+
+	if (std::find(NMSTextOffsets.begin(), NMSTextOffsets.end(), offset) != NMSTextOffsets.end()) {
+		return DrawText_original(w0, w1, w2, w3, s0, s1, Text, w4);
+	}
+	return DrawText_original(w0, w1, w2, w3, s0, s1, Text, w4);
+}
+
 void patchTfoaf1Code() {
 	// Patches for reversing YES NO
 	uint8_t reverseYesNoResult_code[4] = {0x1F, 0x01, 0x00, 0x71};
@@ -123,6 +134,13 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 		A64HookFunction((void*)pointer,
 			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
 			(void**)&Wins_YesNoWindow_Set_original);
+		
+		// Hook DrawText
+		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z8DrawTextiiijPKcffi");
+		A64HookFunction((void*)pointer,
+			reinterpret_cast<void*>(DrawText_hook),
+			(void**)&DrawText_original);
+		
 		
 		// Find symbol to determine NRO start pointer
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
