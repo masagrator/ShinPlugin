@@ -80,9 +80,12 @@ void patchTfoaf1Code() {
 	uint8_t reverseYesNoResult_code[4] = {0x1F, 0x01, 0x00, 0x71};
 	uint8_t reverseCancelOK_YesNoSounds_code[4] = {0x15, 0x09, 0x00, 0x35};
 	uint8_t notInterpretBackAsYes_code[4] = {0xE0, 0x2E, 0x00, 0x79};
+	uint8_t nopUserName_code[4] = {0x1F, 0x20, 0x03, 0xD5};
+
 	ptrdiff_t reverseYesNoResult_ptr = 0x559E0;
 	ptrdiff_t reverseCancelOK_YesNoSounds_ptr = 0x54608;
 	ptrdiff_t notInterpretBackAsYes_ptr = 0x54720;
+	ptrdiff_t nopUserName_ptr = 0x536E0;
 
 	sky_memcpy((void*)(NRO_Tfoaf1_start + reverseYesNoResult_ptr), 
 					&reverseYesNoResult_code, 4);
@@ -90,6 +93,8 @@ void patchTfoaf1Code() {
 					&reverseCancelOK_YesNoSounds_code, 4);
 	sky_memcpy((void*)(NRO_Tfoaf1_start + notInterpretBackAsYes_ptr), 
 					&notInterpretBackAsYes_code, 4);
+	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserName_ptr), 
+					&nopUserName_code, 4);
 
 	return;
 }
