@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
-      run: make -j$
+      run: make -j$(nproc)
     - uses: actions/upload-artifact@v2
       with:
         name: Plugin
