@@ -1,0 +1,28 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: toolchain setup
+      run: docker pull devkitpro/toolchain-base
+    - name: devkitarm setup
+      run: docker pull devkitpro/devkita64_devkitarm
+    - name: make
+      run: make
+    - name: zip
+      run: sudo apt install zip && zip -r Plugin.zip 010005F00E036000
+    - name: release
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Plugin
+        path: Plugin.zip
