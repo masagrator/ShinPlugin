@@ -6,9 +6,10 @@ std::vector<ptrdiff_t> NMSTextOffsets = {
     0x4EFAC //Static Text
 };
 
+// Those offsets are used for Ruby to calculate middle of text
 std::vector<ptrdiff_t> GetLastXOffsets = {
-    0x46128,
-    0x46298
+    0x46128, // Keyword Start
+    0x46298 // Keyword End
 };
 
 int64_t getDrawTextWidth(char const* Text, float scale);
