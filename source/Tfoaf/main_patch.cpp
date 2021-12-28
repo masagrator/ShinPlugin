@@ -124,7 +124,6 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 	static char* textBufferSJIS = 0;
 	static char* textBufferUTF8 = 0;
 	static uint8_t offset = 0;
-	char* valid = PutCodeTo_original(_NMS_CTL_PARAM, byte1, byte2);
 	if ((byte1 == 0x81) && (byte2 == 0x6b)) {
 		offset = 0;
 		textBufferSJIS = (char*)calloc(1, 0x40);
@@ -133,6 +132,8 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 		memcpy(textBufferSJIS, &byte1, 1);
 		memcpy(textBufferSJIS+1, &byte2, 1);
 		offset = 2;
+		byte1 = 0x5B;
+		byte2 = 0;
 	}
 	else if ((byte1 == 0x81) && (byte2 == 0x6c)) {
 		Keyword = false;
@@ -142,6 +143,8 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 		store_X2 = getDrawTextWidth(textBufferUTF8, 1.0);
 		free(textBufferSJIS);
 		free(textBufferUTF8);
+		byte1 = 0x5D;
+		byte2 = 0;
 	}
 	else if (Keyword == true) {
 		if (byte1 != 0) {
@@ -153,7 +156,7 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 			offset += 1;
 		}
 	}
-	return valid;
+	return PutCodeTo_original(_NMS_CTL_PARAM, byte1, byte2);
 }
 
 void patchTfoaf1Code() {
