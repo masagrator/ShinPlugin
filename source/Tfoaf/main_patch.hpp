@@ -30,6 +30,8 @@ struct find_JPN {
 
 uintptr_t NRO_Tfoaf1_start = 0;
 bool notDuospaced = false;
+ptrdiff_t PosX_offset = 0x11D4F6C;
+uint16_t* PosX_static = 0;
 
 Result nn::ro::LoadModule(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) LINKABLE;
 Result nn::ro::LookupModuleSymbol(uintptr_t* pOutAddress, const Module* pModule, const char* name) LINKABLE;
@@ -37,3 +39,4 @@ Result nn::ro::LookupModuleSymbol(uintptr_t* pOutAddress, const Module* pModule,
 void (*SJIStoUTF8_original)(char const* src, int bufferSize, char* dst);
 Result (*LoadModule_original)(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag);
 void (*CMojiFontDraw_original)(void* unk0, void* unk1, void* unk2);
+uint32_t (*GetLastX_original)(void);
