@@ -5,8 +5,8 @@ std::vector<ptrdiff_t> NMSTextOffsets = {
     0x4E6A4, //Animated Text
     0x4EFAC, //Static Text
     0x37C80, //Select
-    0x387A0  //After Select
-
+    0x387A0, //After Select
+    0x46F94  //FOAF popup
 };
 
 // Those offsets are used for Ruby to calculate middle of text
