@@ -87,7 +87,7 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 		if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
 			Pos_X = Old_X + OldText_width;
 		}
-		OldText_width = _Z16getDrawTextWidthPKcf(Text, ScaleX);
+		OldText_width = getDrawTextWidth(Text, ScaleX);
 		Old_X = Pos_X;
 		Old_Y = Pos_Y;
 	}
@@ -127,11 +127,9 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
 
-		/* Hook two functions responsible for converting text between encodings
+		/* Hook function responsible for converting text between encodings
 		to replace text in certain parts of game on the fly.*/
 		uintptr_t pointer = 0;
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
-		memcpy((void**)&UTF8toSJIS_NX, &pointer, 8);
 	
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13SJIStoUTF8_NXPKciPc");
 		A64HookFunction((void*)pointer,
