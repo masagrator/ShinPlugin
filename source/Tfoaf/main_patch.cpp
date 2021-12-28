@@ -126,25 +126,25 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 	static uint8_t offset = 0;
 	if ((byte1 == 0x81) && (byte2 == 0x6b)) {
 		offset = 0;
+		byte1 = 0x5B;
+		byte2 = 0;
 		textBufferSJIS = (char*)calloc(1, 0x40);
 		textBufferUTF8 = (char*)calloc(1, 0x40);
 		Keyword = true;
 		memcpy(textBufferSJIS, &byte1, 1);
-		memcpy(textBufferSJIS+1, &byte2, 1);
-		offset = 2;
-		byte1 = 0x5B;
-		byte2 = 0;
+		//memcpy(textBufferSJIS+1, &byte2, 1);
+		offset = 1;
 	}
 	else if ((byte1 == 0x81) && (byte2 == 0x6c)) {
 		Keyword = false;
+		byte1 = 0x5D;
+		byte2 = 0;
 		memcpy(textBufferSJIS+offset, &byte1, 1);
-		memcpy(textBufferSJIS+offset+1, &byte2, 1);
+		//memcpy(textBufferSJIS+offset+1, &byte2, 1);
 		SJIStoUTF8_original(textBufferSJIS, 0x40, textBufferUTF8);
 		store_X2 = getDrawTextWidth(textBufferUTF8, 1.0);
 		free(textBufferSJIS);
 		free(textBufferUTF8);
-		byte1 = 0x5D;
-		byte2 = 0;
 	}
 	else if (Keyword == true) {
 		if (byte1 != 0) {
