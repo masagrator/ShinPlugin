@@ -224,7 +224,6 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 		// Find symbol to determine NRO start pointer
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 		NRO_Tfoaf1_start = pointer - 0x7000;
-		PosX_static = (uint16_t*)(NRO_Tfoaf1_start + PosX_offset);
 		patchTfoaf1Code();
 		
 	}
@@ -236,7 +235,7 @@ void CMojiFontDraw_hook(void* fontPtr, void* unk1, void* unk2) {
 
 	CMojiFontDraw_original(fontPtr, unk1, unk2);
 
-	notDuospaced = true;
+	bool notDuospaced = true;
 	memcpy((void*)((uintptr_t)fontPtr+38), &notDuospaced, 1);
 	return;
 }
