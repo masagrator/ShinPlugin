@@ -70,10 +70,12 @@ std::vector<Text> Logic = {
 	{"田村さんは砂堀さんに貸し剥がしをした", "Tamura stripped Sunahori of his debt."},
 	{"砂堀さんは田村さんに殴り込みに行った", "Sunahori went to confront Tamura."},
 	{"砂堀さんは田村さんに土下座した", "Sunahori got down on his knees to Tamura."},
+    {"砂堀さんは田村さんに怨恨があった", "砂堀さんは田村さんに怨恨があった"},
 
 	{"空欄のまま保留んに怨恨があったた", "Blank, Pending Investigation."},
 	{"牧村さんは田村さんに怨恨があった", "Makimura had a grudge against Tamura."},
 	{"牧村さんは田村さんと面識がなかった", "Makimura had never met Tamura."},
+    {"牧村さんは田村さんの保険金が目的だった", "牧村さんは田村さんの保険金が目的だった"},
 
 	{"空欄のまま保留んの保険金が目的だった", "Blank, Pending Investigation."},
 	{"津田沼さんはスクープを欲しがっている", "Tsudanuma wants the scoop."},
