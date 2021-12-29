@@ -39,7 +39,7 @@ std::vector<Text> Logic = {
 	{"関本はインテリだ", "Sekimoto is an academic."},
 	{"関本はナンパ野郎だ", "Sekimoto is a pick-up artist."},
 	{"関本はコメディアンだ", "Sekimoto is a comedian."},
-	{"関本はペテン師だだ", "Sekimoto is a phony."},
+	{"関本はペテン師だ", "Sekimoto is a phony."},
 	{"関本はイカれた殺人鬼だ", "Sekimoto is a psychopath."},
 	{"関本は地下牢の悪魔だ", "Sekimoto is the Devil in the Dungeon."},
 
@@ -64,15 +64,15 @@ std::vector<Text> Logic = {
 	{"遥さんは田村さんにＤＶを受けていた", "Haruka was subjected to domestic violence by Tamura."},
 	{"遥さんの青あざは田村さんによるものだ", "Haruka's bruising is caused by Tamura."},
 	{"遥さんは田村さんに復讐をしたものだ", "Haruka was the one who took revenge on Tamura."},
-	{"遥さんは田村さんに怨恨があったのだ", "Haruka had a grudge against Tamura."},
+	{"遥さんは田村さんに怨恨があった", "Haruka had a grudge against Tamura."},
 
 	{"空欄のまま保留の愛人だったのだ", "Blank, Pending Investigation."},
 	{"田村さんは砂堀さんに貸し剥がしをした", "Tamura stripped Sunahori of his debt."},
 	{"砂堀さんは田村さんに殴り込みに行った", "Sunahori went to confront Tamura."},
-	{"砂堀さんは田村さんに土下座したった", "Sunahori got down on his knees to Tamura."},
+	{"砂堀さんは田村さんに土下座した", "Sunahori got down on his knees to Tamura."},
 
 	{"空欄のまま保留んに怨恨があったた", "Blank, Pending Investigation."},
-	{"牧村さんは田村さんに怨恨があったた", "Makimura had a grudge against Tamura."},
+	{"牧村さんは田村さんに怨恨があった", "Makimura had a grudge against Tamura."},
 	{"牧村さんは田村さんと面識がなかった", "Makimura had never met Tamura."},
 
 	{"空欄のまま保留んの保険金が目的だった", "Blank, Pending Investigation."},
