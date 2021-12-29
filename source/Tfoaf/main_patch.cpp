@@ -160,26 +160,12 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 }
 
 void patchTfoaf1Code() {
-	// Patches for reversing YES NO
-	uint8_t reverseYesNoResult_code[4] = {0x1F, 0x01, 0x00, 0x71};
-	uint8_t reverseCancelOK_YesNoSounds_code[4] = {0x15, 0x09, 0x00, 0x35};
-	uint8_t notInterpretBackAsYes_code[4] = {0xE0, 0x2E, 0x00, 0x79};
-
-	ptrdiff_t reverseYesNoResult_ptr = 0x559E0;
-	ptrdiff_t reverseCancelOK_YesNoSounds_ptr = 0x54608;
-	ptrdiff_t notInterpretBackAsYes_ptr = 0x54720;
 	// Patch that removes option to write user name instead of true MC name
 	uint8_t nopUserName_code[4] = {0x1F, 0x20, 0x03, 0xD5};
 
 	ptrdiff_t nopUserNameMainWindow_ptr = 0x536E0;
 	ptrdiff_t nopUserNameBacklog_ptr = 0x53CBC;
 
-	sky_memcpy((void*)(NRO_Tfoaf1_start + reverseYesNoResult_ptr), 
-					&reverseYesNoResult_code, 4);
-	sky_memcpy((void*)(NRO_Tfoaf1_start + reverseCancelOK_YesNoSounds_ptr), 
-					&reverseCancelOK_YesNoSounds_code, 4);
-	sky_memcpy((void*)(NRO_Tfoaf1_start + notInterpretBackAsYes_ptr), 
-					&notInterpretBackAsYes_code, 4);
 	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameMainWindow_ptr), 
 					&nopUserName_code, 4);
 	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameBacklog_ptr), 
