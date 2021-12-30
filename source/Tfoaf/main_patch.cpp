@@ -95,8 +95,12 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 		OldText_width = getDrawTextWidth(Text, ScaleX);
 		store_X1 = Pos_X + OldText_width;
 		Old_X = Pos_X;
-		Old_Y = Pos_Y;
-		store_Y1 = Pos_Y;
+		Old_Y = store_Y1 = Pos_Y;
+		//Write manually offset for CompletionMark if Select offset is detected
+		if (offset == NMSTextOffsets[2]) {
+			uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08);
+			*CompletionMarkOffset = store_X1;
+		}
 	}
 	return DrawText_original(Pos_X, Pos_Y, Pos_Z, w3, ScaleX, ScaleY, Text, w4);
 }
@@ -160,16 +164,23 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 }
 
 void patchTfoaf1Code() {
-	// Patch that removes option to write user name instead of true MC name
-	uint8_t nopUserName_code[4] = {0x1F, 0x20, 0x03, 0xD5};
+	uint8_t NOP_code[4] = {0x1F, 0x20, 0x03, 0xD5};
 
-	ptrdiff_t nopUserNameMainWindow_ptr = 0x536E0;
-	ptrdiff_t nopUserNameBacklog_ptr = 0x53CBC;
+	// Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
+	ptrdiff_t nopUserNameMainWindow_offset = 0x536E0;
+	ptrdiff_t nopUserNameBacklog_offset = 0x53CBC;
 
-	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameMainWindow_ptr), 
-					&nopUserName_code, 4);
-	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameBacklog_ptr), 
-					&nopUserName_code, 4);
+	/*Offset that NOPped is blocking writing CompletionMark X offset by game.
+	Check DrawText hook that is taking job of writing X offset.*/
+	ptrdiff_t nopCompletionMarkPosX_offset = 0x37CAC;
+
+	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameMainWindow_offset), 
+					&NOP_code, 4);
+	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameBacklog_offset), 
+					&NOP_code, 4);
+	
+	sky_memcpy((void*)(NRO_Tfoaf1_start + nopCompletionMarkPosX_offset), 
+					&NOP_code, 4);
 
 	return;
 }
