@@ -95,12 +95,19 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 		OldText_width = getDrawTextWidth(Text, ScaleX);
 		store_X1 = Pos_X + OldText_width;
 		Old_X = Pos_X;
-		Old_Y = store_Y1 = Pos_Y;
-		//Write manually offset for CompletionMark if Select offset is detected
 		if (offset == NMSTextOffsets[2]) {
-			uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08);
+			/*Completion mark has hardcoded entry for each select in NRO.
+			Each entry takes size of 0x5C.
+			We need to take this to account to not overwrite previous rows.*/
+			static int Select_row_line = 0;
+			if (Old_Y < Pos_Y) Select_row_line += 1;
+			else if (Old_Y > Pos_Y) Select_row_line = 0;
+			ptrdiff_t RowEntry = 0x5C * Select_row_line;
+			uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08 + RowEntry);
 			*CompletionMarkOffset = store_X1;
 		}
+		Old_Y = store_Y1 = Pos_Y;
+		//Write manually offset for CompletionMark if Select offset is detected
 	}
 	return DrawText_original(Pos_X, Pos_Y, Pos_Z, w3, ScaleX, ScaleY, Text, w4);
 }
