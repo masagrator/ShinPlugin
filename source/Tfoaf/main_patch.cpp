@@ -1,6 +1,5 @@
 #include "main_patch.hpp"
 #include <span>
-#define UTF8 std::char_traits<char>
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
 	return LR - NRO_Tfoaf1_start;
