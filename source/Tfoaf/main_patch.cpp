@@ -1,13 +1,14 @@
 #include "main_patch.hpp"
+#include <span>
+#define UTF8 std::char_traits<char>
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
 	return LR - NRO_Tfoaf1_start;
 }
 
-void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int bufferSize, std::vector<Text>::iterator itr) {
-	if (itr != Vector.end() && Vector[std::distance(Vector.begin(), itr)].ENG.size() <= (size_t)bufferSize) {
-		memcpy(dst, Vector[std::distance(Vector.begin(), itr)].ENG.c_str(),
-		       Vector[std::distance(Vector.begin(), itr)].ENG.size());
+void ReplaceSJIStoUTF8(std::span<Text> Vector, const char* src, char* dst, int bufferSize, std::span<Text>::iterator itr) {
+	if (itr != Vector.end() && strlen(itr->ENG) <= (size_t)bufferSize) {
+		memcpy(dst, itr->ENG, strlen(itr->ENG));
 		return;
 	}
 	return SJIStoUTF8_original(src, bufferSize, dst);
@@ -16,64 +17,64 @@ void ReplaceSJIStoUTF8(std::vector<Text> Vector, const char* src, char* dst, int
 void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 	ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
 
+	if (ShinHaya1_set) {
+		if (offset == SH1::LogicOffset) {
+			char* checkJPN = (char*)calloc(1, bufferSize);
+			SJIStoUTF8_original(src, bufferSize, checkJPN);
 
-	if (offset == LogicOffset) {
-		char* checkJPN = (char*)calloc(1, bufferSize);
-		SJIStoUTF8_original(src, bufferSize, checkJPN);
-
-		std::string compareJPN = checkJPN;
-		free(checkJPN);
-
-		return ReplaceSJIStoUTF8(Logic, src, dst, bufferSize,
-					std::find_if(Logic.begin(), Logic.end(), find_JPN(compareJPN)));
-	}
-	else if (std::find(TreeOffsets.begin(), TreeOffsets.end(), offset) != TreeOffsets.end()) {
-		auto offsetItr = std::distance(TreeOffsets.begin(),
-					      std::find(TreeOffsets.begin(), TreeOffsets.end(), offset));
-
-		char* checkJPN = (char*)calloc(1, bufferSize);
-		SJIStoUTF8_original(src, bufferSize, checkJPN);
-		std::string compareJPN = checkJPN;
-		free(checkJPN);
-
-		switch(offsetItr) {
-			case 0:
-			case 4:
-				ReplaceSJIStoUTF8(Tree2C, src, dst, bufferSize, 
-						 std::find_if(Tree2C.begin(), Tree2C.end(), find_JPN(compareJPN)));
-				break;
-			case 1:
-				ReplaceSJIStoUTF8(Tree4C, src, dst, bufferSize,
-						 std::find_if(Tree4C.begin(), Tree4C.end(), find_JPN(compareJPN)));
-				break;
-			case 2:
-				ReplaceSJIStoUTF8(Tree8C, src, dst, bufferSize,
-						 std::find_if(Tree8C.begin(), Tree8C.end(), find_JPN(compareJPN)));
-				break;
-			case 3:
-				ReplaceSJIStoUTF8(TreeCC, src, dst, bufferSize,
-						 std::find_if(TreeCC.begin(), TreeCC.end(), find_JPN(compareJPN)));
-				break;
-			default:
-				SJIStoUTF8_original(src, bufferSize, dst);
-				break;
+			ReplaceSJIStoUTF8(SH1::Logic, src, dst, bufferSize,
+						std::find_if(SH1::Logic.begin(), SH1::Logic.end(), find_JPN(checkJPN)));
+			free(checkJPN);
+			return;
 		}
-		return;
+		else if (std::find(SH1::TreeOffsets.begin(), SH1::TreeOffsets.end(), offset) != SH1::TreeOffsets.end()) {
+			auto offsetItr = std::distance(SH1::TreeOffsets.begin(),
+							std::find(SH1::TreeOffsets.begin(), SH1::TreeOffsets.end(), offset));
+
+			char* checkJPN = (char*)calloc(1, bufferSize);
+			SJIStoUTF8_original(src, bufferSize, checkJPN);
+
+			switch(offsetItr) {
+				case 0:
+				case 4:
+					ReplaceSJIStoUTF8(SH1::Tree2C, src, dst, bufferSize, 
+							std::find_if(SH1::Tree2C.begin(), SH1::Tree2C.end(), find_JPN(checkJPN)));
+					break;
+				case 1:
+					ReplaceSJIStoUTF8(SH1::Tree4C, src, dst, bufferSize,
+							std::find_if(SH1::Tree4C.begin(), SH1::Tree4C.end(), find_JPN(checkJPN)));
+					break;
+				case 2:
+					ReplaceSJIStoUTF8(SH1::Tree8C, src, dst, bufferSize,
+							std::find_if(SH1::Tree8C.begin(), SH1::Tree8C.end(), find_JPN(checkJPN)));
+					break;
+				case 3:
+					ReplaceSJIStoUTF8(SH1::TreeCC, src, dst, bufferSize,
+							std::find_if(SH1::TreeCC.begin(), SH1::TreeCC.end(), find_JPN(checkJPN)));
+					break;
+				default:
+					SJIStoUTF8_original(src, bufferSize, dst);
+					break;
+			}
+			free(checkJPN);
+			return;
+
+		}
+	}
+	else {
 
 	}
-	else return SJIStoUTF8_original(src, bufferSize, dst);
+	return SJIStoUTF8_original(src, bufferSize, dst);
 }
 
 uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* string1, const char* string2) {
 	if (strncmp(string1, "\x00", 1) != 0) {
-		std::string compare1 = string1;
-		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare1));
-		if (itr1 != YesNo.end()) string1 = YesNo[std::distance(YesNo.begin(), itr1)].ENG.c_str();
+		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string1));
+		if (itr1 != YesNo.end()) string1 = itr1->ENG;
 	}
 	if (strncmp(string2, "\x00", 1) != 0) {
-		std::string compare2 = string2;
-		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(compare2));
-		if (itr2 != YesNo.end()) string2 = YesNo[std::distance(YesNo.begin(), itr2)].ENG.c_str();
+		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string2));
+		if (itr2 != YesNo.end()) string2 = itr2->ENG;
 	}
 	return Wins_YesNoWindow_Set_original(unk0, unk1, unk2, string1, string2);
 }
@@ -85,53 +86,63 @@ int store_Y1 = 0;
 uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float ScaleX, float ScaleY, char const* Text, int w4) {
 	ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
 
-	if (std::find(NMSTextOffsets.begin(), NMSTextOffsets.end(), offset) != NMSTextOffsets.end()) {
-		static int Old_X = 0;
-		static int Old_Y = 0;
-		static int64_t OldText_width = 0;
+	if (ShinHaya1_set) {
+		if (std::find(SH1::NMSTextOffsets.begin(), SH1::NMSTextOffsets.end(), offset) != SH1::NMSTextOffsets.end()) {
+			static int Old_X = 0;
+			static int Old_Y = 0;
+			static int64_t OldText_width = 0;
 
-		if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
-			Pos_X = Old_X + OldText_width;
+			if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
+				Pos_X = Old_X + OldText_width;
+			}
+
+			OldText_width = getDrawTextWidth(Text, ScaleX);
+			store_X1 = Pos_X + OldText_width;
+			Old_X = Pos_X;
+
+			if (offset == SH1::NMSTextOffsets[2]) {	//Write manually offset for CompletionMark if Select offset is detected
+
+				/*Completion mark has hardcoded entry for each select in NRO.
+				Each entry takes size of 0x5C.
+				We need to take this to account to not overwrite previous rows.*/
+
+				static int Select_row_line = 0;
+				if (Old_Y < Pos_Y) Select_row_line += 1;
+				else if (Old_Y > Pos_Y) Select_row_line = 0;
+				ptrdiff_t RowEntry = 0x5C * Select_row_line;
+
+				uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08 + RowEntry);
+				*CompletionMarkOffset = store_X1;
+			}
+			
+			Old_Y = store_Y1 = Pos_Y;
 		}
+	}
+	else {
 
-		OldText_width = getDrawTextWidth(Text, ScaleX);
-		store_X1 = Pos_X + OldText_width;
-		Old_X = Pos_X;
-
-		if (offset == NMSTextOffsets[2]) {	//Write manually offset for CompletionMark if Select offset is detected
-
-			/*Completion mark has hardcoded entry for each select in NRO.
-			Each entry takes size of 0x5C.
-			We need to take this to account to not overwrite previous rows.*/
-
-			static int Select_row_line = 0;
-			if (Old_Y < Pos_Y) Select_row_line += 1;
-			else if (Old_Y > Pos_Y) Select_row_line = 0;
-			ptrdiff_t RowEntry = 0x5C * Select_row_line;
-
-			uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08 + RowEntry);
-			*CompletionMarkOffset = store_X1;
-		}
-		
-		Old_Y = store_Y1 = Pos_Y;
 	}
 	return DrawText_original(Pos_X, Pos_Y, Pos_Z, w3, ScaleX, ScaleY, Text, w4);
 }
 
 int32_t GetLastX_hook(void) {
 	ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
-	if (std::find(GetLastXOffsets.begin(), GetLastXOffsets.end(), offset) != GetLastXOffsets.end()) {
-		auto offsetItr = std::distance(GetLastXOffsets.begin(), std::find(GetLastXOffsets.begin(), GetLastXOffsets.end(), offset));
-		switch (offsetItr) {
-			case 0:
-				if (NmsTextView_GetLastY() != store_Y1)
-					store_X1 = GetLastX_original();
-				return store_X1;
-			case 1:
-				int value = store_X1 + store_X2;
-				store_X2 = 0;
-				return value;
+	if (ShinHaya1_set) {
+		if (std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset) != SH1::GetLastXOffsets.end()) {
+			auto offsetItr = std::distance(SH1::GetLastXOffsets.begin(), std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset));
+			switch (offsetItr) {
+				case 0:
+					if (NmsTextView_GetLastY() != store_Y1)
+						store_X1 = GetLastX_original();
+					return store_X1;
+				case 1:
+					int value = store_X1 + store_X2;
+					store_X2 = 0;
+					return value;
+			}
 		}
+	}
+	else {
+
 	}
 	return GetLastX_original();
 }
@@ -201,6 +212,7 @@ void patchTfoaf1Code() {
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
 	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
+		ShinHaya1_set = true;
 
 		/* Hook function responsible for converting text between encodings
 		to replace text in certain parts of game on the fly.*/

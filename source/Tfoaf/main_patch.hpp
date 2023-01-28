@@ -18,17 +18,16 @@ extern "C" {
 }
 
 struct find_JPN {
-	std::string JPN;
-	find_JPN(std::string JPN) : JPN(JPN) {}
+	const char* JPN;
+	find_JPN(const char* JPN) : JPN(JPN) {}
 	bool operator () ( const Text& m ) const
 	{
 		return m.JPN == JPN;
 	}
 };
 
-
-
 uintptr_t NRO_Tfoaf1_start = 0;
+bool ShinHaya1_set = false;
 
 Result nn::ro::LoadModule(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) LINKABLE;
 Result nn::ro::LookupModuleSymbol(uintptr_t* pOutAddress, const Module* pModule, const char* name) LINKABLE;
