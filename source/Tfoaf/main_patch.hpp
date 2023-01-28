@@ -4,6 +4,7 @@
 #include "skyline/utils/cpputils.hpp"
 #include "skyline/inlinehook/memcpy_controlled.hpp"
 #include "nn/ro.h"
+#include <span>
 #include "Tree.hpp"
 #include "Logic.hpp"
 #include "YesNo.hpp"

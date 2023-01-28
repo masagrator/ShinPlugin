@@ -1,5 +1,4 @@
 #include "main_patch.hpp"
-#include <span>
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
 	return LR - NRO_Tfoaf_start;
