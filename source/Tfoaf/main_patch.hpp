@@ -3,9 +3,6 @@
 #include "skyline/inlinehook/And64InlineHook.hpp"
 #include "skyline/utils/cpputils.hpp"
 #include "skyline/inlinehook/memcpy_controlled.hpp"
-#include <vector>
-#include <string>
-#include <algorithm>
 #include "nn/ro.h"
 #include "Tree.hpp"
 #include "Logic.hpp"
@@ -22,7 +19,7 @@ struct find_JPN {
 	find_JPN(const char* JPN) : JPN(JPN) {}
 	bool operator () ( const Text& m ) const
 	{
-		return m.JPN == JPN;
+		return !strncmp(m.JPN, JPN, strlen(m.JPN));
 	}
 };
 
