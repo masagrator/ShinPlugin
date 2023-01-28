@@ -67,11 +67,11 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 }
 
 uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* string1, const char* string2) {
-	if (strncmp(string1, "\x00", 1)) {
+	if (string1[0]) {
 		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string1));
 		if (itr1 != YesNo.end()) string1 = itr1->ENG;
 	}
-	if (strncmp(string2, "\x00", 1)) {
+	if (string2[0]) {
 		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string2));
 		if (itr2 != YesNo.end()) string2 = itr2->ENG;
 	}
@@ -254,13 +254,11 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 	return ret;
 }
 
-
-void CMojiFontDraw_hook(void* fontPtr, void* unk1, void* unk2) {
+void CMojiFontDraw_hook(CMojiFont* fontPtr, void* unk1, void* unk2) {
 
 	CMojiFontDraw_original(fontPtr, unk1, unk2);
 
-	bool notDuospaced = true;
-	memcpy((void*)((uintptr_t)fontPtr+38), &notDuospaced, 1);
+	fontPtr -> varWidth = true;
 	return;
 }
 
