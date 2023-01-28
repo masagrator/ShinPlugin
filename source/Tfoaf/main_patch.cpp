@@ -2,7 +2,7 @@
 #include <span>
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
-	return LR - NRO_Tfoaf1_start;
+	return LR - NRO_Tfoaf_start;
 }
 
 void ReplaceSJIStoUTF8(std::span<Text> Vector, const char* src, char* dst, int bufferSize, std::span<Text>::iterator itr) {
@@ -110,7 +110,7 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 				else if (Old_Y > Pos_Y) Select_row_line = 0;
 				ptrdiff_t RowEntry = 0x5C * Select_row_line;
 
-				uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf1_start + 0x11CAB08 + RowEntry);
+				uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf_start + 0x11CAB08 + RowEntry);
 				*CompletionMarkOffset = store_X1;
 			}
 			
@@ -197,12 +197,12 @@ void patchTfoaf1Code() {
 	Check DrawText hook that is taking job of writing X offset.*/
 	ptrdiff_t nopCompletionMarkPosX_offset = 0x37CAC;
 
-	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameMainWindow_offset), 
+	sky_memcpy((void*)(NRO_Tfoaf_start + nopUserNameMainWindow_offset), 
 					&NOP_code, 4);
-	sky_memcpy((void*)(NRO_Tfoaf1_start + nopUserNameBacklog_offset), 
+	sky_memcpy((void*)(NRO_Tfoaf_start + nopUserNameBacklog_offset), 
 					&NOP_code, 4);
 	
-	sky_memcpy((void*)(NRO_Tfoaf1_start + nopCompletionMarkPosX_offset), 
+	sky_memcpy((void*)(NRO_Tfoaf_start + nopCompletionMarkPosX_offset), 
 					&NOP_code, 4);
 
 	return;
@@ -210,7 +210,7 @@ void patchTfoaf1Code() {
 
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
-	if (strcmp(pOutModule->pathToNro, "nro/Tfoaf1.nro") == 0) {
+	if (strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro")) == 0) {
 		ShinHaya1_set = true;
 
 		/* Hook function responsible for converting text between encodings
@@ -247,7 +247,7 @@ Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buf
 
 		// Find symbol to determine NRO start pointer
 		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
-		NRO_Tfoaf1_start = pointer - 0x7000;
+		NRO_Tfoaf_start = pointer - 0x7000;
 		patchTfoaf1Code();
 		
 	}

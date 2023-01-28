@@ -26,7 +26,7 @@ struct find_JPN {
 	}
 };
 
-uintptr_t NRO_Tfoaf1_start = 0;
+uintptr_t NRO_Tfoaf_start = 0;
 bool ShinHaya1_set = false;
 
 Result nn::ro::LoadModule(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) LINKABLE;
