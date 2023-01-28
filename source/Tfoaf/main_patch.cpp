@@ -67,11 +67,11 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 }
 
 uint64_t Wins_YesNoWindow_Set_hook(int unk0, int unk1, int unk2, const char* string1, const char* string2) {
-	if (strncmp(string1, "\x00", 1) != 0) {
+	if (strncmp(string1, "\x00", 1)) {
 		auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string1));
 		if (itr1 != YesNo.end()) string1 = itr1->ENG;
 	}
-	if (strncmp(string2, "\x00", 1) != 0) {
+	if (strncmp(string2, "\x00", 1)) {
 		auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string2));
 		if (itr2 != YesNo.end()) string2 = itr2->ENG;
 	}
@@ -173,12 +173,12 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 		free(textBufferSJIS);
 		free(textBufferUTF8);
 	}
-	else if (Keyword == true) {
-		if (byte1 != 0) {
+	else if (Keyword) {
+		if (byte1) {
 			memcpy(textBufferSJIS+offset, &byte1, 1);
 			offset += 1;
 		}
-		if (byte2 != 0) {
+		if (byte2) {
 			memcpy(textBufferSJIS+offset, &byte2, 1);
 			offset += 1;
 		}
@@ -210,7 +210,7 @@ void patchTfoaf1Code() {
 
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
-	if (strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro")) == 0) {
+	if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
 		ShinHaya1_set = true;
 
 		/* Hook function responsible for converting text between encodings
