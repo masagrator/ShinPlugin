@@ -12,7 +12,8 @@
 #define LINKABLE __attribute__ ((weak))
 
 extern "C" {
-	void _ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE(void* unk0, void* unk1, void* unk2) LINKABLE;
+	// This function has only one argument, but two more are used to fix issue with segfault
+	void _ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE(void* CMojiFont, void* unk1, void* unk2) LINKABLE;
 }
 
 struct CMojiFont {
