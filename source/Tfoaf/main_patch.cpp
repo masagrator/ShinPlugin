@@ -50,9 +50,6 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 					ReplaceSJIStoUTF8(SH1::TreeCC, src, dst, bufferSize,
 							std::find_if(SH1::TreeCC.begin(), SH1::TreeCC.end(), find_JPN(checkJPN)));
 					break;
-				default:
-					SJIStoUTF8_original(src, bufferSize, dst);
-					break;
 			}
 			free(checkJPN);
 			return;
@@ -60,7 +57,45 @@ void SJIStoUTF8_hook(char const* src, int bufferSize, char* dst) {
 		}
 	}
 	else {
+		if (offset == SH2::LogicOffset) {
+			char* checkJPN = (char*)calloc(1, bufferSize);
+			SJIStoUTF8_original(src, bufferSize, checkJPN);
 
+			ReplaceSJIStoUTF8(SH2::Logic, src, dst, bufferSize,
+						std::find_if(SH2::Logic.begin(), SH2::Logic.end(), find_JPN(checkJPN)));
+			free(checkJPN);
+			return;
+		}
+		else if (std::find(SH2::TreeOffsets.begin(), SH2::TreeOffsets.end(), offset) != SH2::TreeOffsets.end()) {
+			auto offsetItr = std::distance(SH2::TreeOffsets.begin(),
+							std::find(SH2::TreeOffsets.begin(), SH2::TreeOffsets.end(), offset));
+
+			char* checkJPN = (char*)calloc(1, bufferSize);
+			SJIStoUTF8_original(src, bufferSize, checkJPN);
+
+			switch(offsetItr) {
+				case 0:
+				case 4:
+					ReplaceSJIStoUTF8(SH2::Tree2C, src, dst, bufferSize, 
+							std::find_if(SH2::Tree2C.begin(), SH2::Tree2C.end(), find_JPN(checkJPN)));
+					break;
+				case 1:
+					ReplaceSJIStoUTF8(SH2::Tree6C, src, dst, bufferSize,
+							std::find_if(SH2::Tree6C.begin(), SH2::Tree6C.end(), find_JPN(checkJPN)));
+					break;
+				case 2:
+					ReplaceSJIStoUTF8(SH2::TreeAC, src, dst, bufferSize,
+							std::find_if(SH2::TreeAC.begin(), SH2::TreeAC.end(), find_JPN(checkJPN)));
+					break;
+				case 3:
+					ReplaceSJIStoUTF8(SH2::TreeEC, src, dst, bufferSize,
+							std::find_if(SH2::TreeEC.begin(), SH2::TreeEC.end(), find_JPN(checkJPN)));
+					break;
+			}
+			free(checkJPN);
+			return;
+
+		}
 	}
 	return SJIStoUTF8_original(src, bufferSize, dst);
 }
@@ -98,7 +133,7 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 			store_X1 = Pos_X + OldText_width;
 			Old_X = Pos_X;
 
-			if (offset == SH1::NMSTextOffsets[2]) {	//Write manually offset for CompletionMark if Select offset is detected
+			if (offset == SH1::NMSTextOffsets[0]) {	//Write manually offset for CompletionMark if Select offset is detected
 
 				/*Completion mark has hardcoded entry for each select in NRO.
 				Each entry takes size of 0x5C.
@@ -116,33 +151,63 @@ uint64_t DrawText_hook(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float S
 			Old_Y = store_Y1 = Pos_Y;
 		}
 	}
-	else {
+	else if (std::find(SH2::NMSTextOffsets.begin(), SH2::NMSTextOffsets.end(), offset) != SH2::NMSTextOffsets.end()) {
+		static int Old_X = 0;
+		static int Old_Y = 0;
+		static int64_t OldText_width = 0;
 
+		if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
+			Pos_X = Old_X + OldText_width;
+		}
+
+		OldText_width = getDrawTextWidth(Text, ScaleX);
+		store_X1 = Pos_X + OldText_width;
+		Old_X = Pos_X;
+
+		if (offset == SH2::NMSTextOffsets[0]) {	//Write manually offset for CompletionMark if Select offset is detected
+
+			/*Completion mark has hardcoded entry for each select in NRO.
+			Each entry takes size of 0x5C.
+			We need to take this to account to not overwrite previous rows.*/
+
+			static int Select_row_line = 0;
+			if (Old_Y < Pos_Y) Select_row_line += 1;
+			else if (Old_Y > Pos_Y) Select_row_line = 0;
+			ptrdiff_t RowEntry = 0x5C * Select_row_line;
+
+			uint32_t* CompletionMarkOffset = (uint32_t*)(NRO_Tfoaf_start + 0x11DB0D0 + RowEntry);
+			*CompletionMarkOffset = store_X1;
+		}
+		
+		Old_Y = store_Y1 = Pos_Y;
 	}
 	return DrawText_original(Pos_X, Pos_Y, Pos_Z, w3, ScaleX, ScaleY, Text, w4);
 }
 
 int32_t GetLastX_hook(void) {
 	ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
-	if (ShinHaya1_set) {
-		if (std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset) != SH1::GetLastXOffsets.end()) {
-			auto offsetItr = std::distance(SH1::GetLastXOffsets.begin(), std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset));
-			switch (offsetItr) {
-				case 0:
-					if (NmsTextView_GetLastY() != store_Y1)
-						store_X1 = GetLastX_original();
-					return store_X1;
-				case 1:
-					int value = store_X1 + store_X2;
-					store_X2 = 0;
-					return value;
-			}
-		}
-	}
-	else {
+	auto offsetItr = -1;
 
+	if (ShinHaya1_set) {
+		if (std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset) != SH1::GetLastXOffsets.end())
+			offsetItr = std::distance(SH1::GetLastXOffsets.begin(), std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset));
 	}
-	return GetLastX_original();
+	else if (std::find(SH2::GetLastXOffsets.begin(), SH2::GetLastXOffsets.end(), offset) != SH2::GetLastXOffsets.end())
+		offsetItr = std::distance(SH2::GetLastXOffsets.begin(), std::find(SH2::GetLastXOffsets.begin(), SH2::GetLastXOffsets.end(), offset));
+
+	switch (offsetItr) {
+		case 0:
+			if (NmsTextView_GetLastY() != store_Y1)
+				store_X1 = GetLastX_original();
+			return store_X1;
+		case 1: {
+			int value = store_X1 + store_X2;
+			store_X2 = 0;
+			return value;
+		}
+		default:
+			return GetLastX_original();
+	}
 }
 
 char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char byte2) {
@@ -185,16 +250,22 @@ char* PutCodeTo_hook(void* _NMS_CTL_PARAM, unsigned char byte1, unsigned char by
 	return PutCodeTo_original(_NMS_CTL_PARAM, byte1, byte2);
 }
 
-void patchTfoaf1Code() {
+void patchTfoafCode() {
+
 	uint8_t NOP_code[4] = {0x1F, 0x20, 0x03, 0xD5};
 
 	// Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
 	ptrdiff_t nopUserNameMainWindow_offset = 0x536E0;
 	ptrdiff_t nopUserNameBacklog_offset = 0x53CBC;
+	if (!ShinHaya1_set) {
+		nopUserNameMainWindow_offset = 0x5831C;
+		nopUserNameBacklog_offset = 0x58B68;
+	}
 
 	/*Offset that NOPped is blocking writing CompletionMark X offset by game.
 	Check DrawText hook that is taking job of writing X offset.*/
 	ptrdiff_t nopCompletionMarkPosX_offset = 0x37CAC;
+	if (!ShinHaya1_set) nopCompletionMarkPosX_offset = 0x3CFE8;
 
 	sky_memcpy((void*)(NRO_Tfoaf_start + nopUserNameMainWindow_offset), 
 					&NOP_code, 4);
@@ -209,47 +280,53 @@ void patchTfoaf1Code() {
 
 Result LoadModule_hook(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
 	Result ret = LoadModule_original(pOutModule, pImage, buffer, bufferSize, 1);
+
+	uintptr_t pointer = 0;
+
+	/* Hook function responsible for converting text between encodings
+	to replace text in certain parts of game on the fly.*/
+	
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13SJIStoUTF8_NXPKciPc");
+	A64HookFunction((void*)pointer,
+		reinterpret_cast<void*>(SJIStoUTF8_hook),
+		(void**)&SJIStoUTF8_original);
+
+	// Hook Yes/No Window to replace hardcoded text
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
+	A64HookFunction((void*)pointer,
+		reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
+		(void**)&Wins_YesNoWindow_Set_original);
+	
+	// Hook DrawText to repair issue with rendering separated parts of text in one line
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z8DrawTextiiijPKcffi");
+	A64HookFunction((void*)pointer,
+		reinterpret_cast<void*>(DrawText_hook),
+		(void**)&DrawText_original);
+	
+	// Hook GetLastX and PutCode to repair Ruby effect
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20NmsTextView_GetLastXv");
+	A64HookFunction((void*)pointer,
+		reinterpret_cast<void*>(GetLastX_hook),
+		(void**)&GetLastX_original);
+
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z16NmsCtl_PutCodeToP14_NMS_CTL_PARAMhh");
+	A64HookFunction((void*)pointer,
+		reinterpret_cast<void*>(PutCodeTo_hook),
+		(void**)&PutCodeTo_original);
+
+	// Find symbol to determine NRO start pointer
+	nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
+
 	if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
 		ShinHaya1_set = true;
-
-		/* Hook function responsible for converting text between encodings
-		to replace text in certain parts of game on the fly.*/
-		uintptr_t pointer = 0;
-	
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13SJIStoUTF8_NXPKciPc");
-		A64HookFunction((void*)pointer,
-			reinterpret_cast<void*>(SJIStoUTF8_hook),
-			(void**)&SJIStoUTF8_original);
-
-		// Hook Yes/No Window to replace hardcoded text
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
-		A64HookFunction((void*)pointer,
-			reinterpret_cast<void*>(Wins_YesNoWindow_Set_hook),
-			(void**)&Wins_YesNoWindow_Set_original);
-		
-		// Hook DrawText to repair issue with rendering separated parts of text in one line
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z8DrawTextiiijPKcffi");
-		A64HookFunction((void*)pointer,
-			reinterpret_cast<void*>(DrawText_hook),
-			(void**)&DrawText_original);
-		
-		// Hook GetLastX and PutCode to repair Ruby effect
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20NmsTextView_GetLastXv");
-		A64HookFunction((void*)pointer,
-			reinterpret_cast<void*>(GetLastX_hook),
-			(void**)&GetLastX_original);
-
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z16NmsCtl_PutCodeToP14_NMS_CTL_PARAMhh");
-		A64HookFunction((void*)pointer,
-			reinterpret_cast<void*>(PutCodeTo_hook),
-			(void**)&PutCodeTo_original);
-
-		// Find symbol to determine NRO start pointer
-		nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 		NRO_Tfoaf_start = pointer - 0x7000;
-		patchTfoaf1Code();
-		
 	}
+	else {
+		NRO_Tfoaf_start = pointer - 0x76E0;
+	}
+
+	patchTfoafCode();
+		
 	return ret;
 }
 
