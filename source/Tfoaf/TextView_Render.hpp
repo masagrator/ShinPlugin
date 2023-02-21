@@ -1,19 +1,21 @@
 #pragma once
 #include "main_patch.hpp"
 
-std::vector<ptrdiff_t> NMSTextOffsets = {
-    0x4E6A4, //Animated Text
-    0x4EFAC, //Static Text
-    0x37C80, //Select
-    0x387A0, //After Select
-    0x46F94  //FOAF popup
-};
+namespace SH1 {
+    std::array NMSTextOffsets = {
+        0x4E6A4, //Animated Text
+        0x4EFAC, //Static Text
+        0x37C80, //Select
+        0x387A0, //After Select
+        0x46F94  //FOAF popup
+    };
 
-// Those offsets are used for Ruby to calculate middle of text
-std::vector<ptrdiff_t> GetLastXOffsets = {
-    0x46128, // Keyword Start
-    0x46298 // Keyword End
-};
+    // Those offsets are used for Ruby to calculate middle of text
+    std::array GetLastXOffsets = {
+        0x46128, // Keyword Start
+        0x46298 // Keyword End
+    };
+}
 
 int64_t getDrawTextWidth(char const* Text, float scale);
 int32_t NmsTextView_GetLastY(void);
