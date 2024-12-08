@@ -32,5 +32,12 @@ namespace SH2 {
     };
 }
 
+enum WinsIcon {
+    dummy = 0,
+    dummy1 = 1,
+    Courage = 0x10
+};
+
 int64_t getDrawTextWidth(char const* Text, float scale);
 int32_t NmsTextView_GetLastY(void);
+int32_t Wins_GetIconWidth(WinsIcon iconId, int scaleInPercent);

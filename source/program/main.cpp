@@ -6,6 +6,57 @@
 #include "Logic.hpp"
 #include "YesNo.hpp"
 #include "TextView_Render.hpp"
+#include "xxHash/xxhash.h"
+#include "textureHashes.hpp"
+#include "nn/fs.hpp"
+#include "nn/os.hpp"
+#include <cstdio>
+#include <cmath>
+
+int countLSBZeros(int value) {
+	unsigned int c = 0;
+	while (((value >> c) & 1) == 0) {
+		c++;
+	}
+	return c;
+}
+
+class Swizzler {
+public:
+	Swizzler() {}
+	Swizzler(unsigned int width, unsigned int bpp, unsigned int blockHeight) {
+		bhMask = (blockHeight * 8) - 1;
+
+		bhShift = countLSBZeros(blockHeight * 8);
+		bppShift = countLSBZeros(bpp);
+
+		unsigned int widthInGobs = (unsigned int)ceil(width * bpp / 64.);
+
+		gobStride = 512 * blockHeight * widthInGobs;
+		xShift = countLSBZeros(blockHeight * 512);
+	}
+
+	unsigned int getOffset(unsigned int x, unsigned int y) {
+		x <<= bppShift;
+
+		unsigned int off = (y >> bhShift) * gobStride;
+		off += (x >> 6) << xShift;
+		off += ((y & bhMask) >> 3) << 9;
+		off += ((x & 0x3F) >> 5) << 8;
+		off += ((y & 0x07) >> 1) << 6;
+		off += ((x & 0x1F) >> 4) << 5;
+		off += ((y & 0x01) >> 0) << 4;
+		off += ((x & 0x0F) >> 0) << 0;
+
+		return off;
+	}
+
+	unsigned int bhMask;
+	unsigned int bhShift;
+	unsigned int bppShift;
+	unsigned int gobStride;
+	unsigned int xShift;
+};
 
 struct CMojiFont {
 	char reserved[38];
@@ -22,27 +73,40 @@ struct find_JPN {
 };
 
 uintptr_t NRO_Tfoaf_start = 0;
-bool ShinHaya1_set = false;
+uint8_t ShinHaya_set = 0;
 uintptr_t SJIStoUTF8_origin = 0;
+uintptr_t gpStartArchive = 0;
+
+struct textureInfo {
+    char reserved[200];
+    int textureFormat;
+};
 
 extern "C" {
 	// This function has only one argument, but two more are used to fix issue with segfault
 	void _ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE(CMojiFont* fontPtr, void* unk1, void* unk2);
     typedef void (*SjisToUtf8)(char const* src, int bufferSize, char* dst);
+    void* _ZN4Nmpl15MemoryInterface14allocateMemoryEm(size_t size);
+    void _ZN4Nmpl15MemoryInterface10freeMemoryEPv(void* buffer);
+    void _ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj(uint8_t* in_buffer, size_t unc_size, void** out_buffer, uint32_t* unk, size_t com_size);
+    FILE* FDKfopen(const char * filename, const char * mode);
+    int FDKfclose(FILE* stream);
+    int FDKfprintf(FILE* stream, const char* format, ...);
+    int FDKfseek(FILE* stream, int offset, int origin);
+    int FDKfread(void* ptr, int size, int count, FILE* stream);
+    int FDKfwrite(const void* ptr, int size, int count, FILE* stream);
+    int FDKftell(FILE* stream);
+    void cnov_swizzle_ram(void* out_buffer, void* in_buffer, uint powerOfTwoHeight, uint powerOfTwoWidth, void* unk1, void* unk2, uint bitsPerBlock);
 }
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
 	return LR - NRO_Tfoaf_start;
 }
 
-/* Define hook StubCopyright. Trampoline indicates the original function should be kept. */
-/* HOOK_DEFINE_REPLACE can be used if the original function does not need to be kept. */
 HOOK_DEFINE_TRAMPOLINE(CMojiFontDraw) {
 
-    /* Define the callback for when the function is called. Don't forget to make it static and name it Callback. */
     static void Callback(CMojiFont* fontPtr, void* unk1, void* unk2) {
 
-        /* Call the original function, with the argument always being false. */
         Orig(fontPtr, unk1, unk2);
         fontPtr -> varWidth = true;
     }
@@ -62,7 +126,7 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
     static void Callback(char const* src, int bufferSize, char* dst) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
 
-        if (ShinHaya1_set) {
+        if (ShinHaya_set == 1) {
             if (offset == SH1::LogicOffset) {
                 char* checkJPN = (char*)calloc(1, bufferSize);
                 Orig(src, bufferSize, checkJPN);
@@ -185,14 +249,14 @@ HOOK_DEFINE_TRAMPOLINE(DrawText) {
     static uint64_t Callback(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float ScaleX, float ScaleY, char const* Text, int w4) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
 
-        if (ShinHaya1_set) {
+        if (ShinHaya_set == 1) {
             if (std::find(SH1::NMSTextOffsets.begin(), SH1::NMSTextOffsets.end(), offset) != SH1::NMSTextOffsets.end()) {
                 static int Old_X = 0;
                 static int Old_Y = 0;
                 static int64_t OldText_width = 0;
 
                 if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
-                    Pos_X = Old_X + OldText_width;
+                    Pos_X = store_X1;
                 }
 
                 OldText_width = getDrawTextWidth(Text, ScaleX);
@@ -223,7 +287,7 @@ HOOK_DEFINE_TRAMPOLINE(DrawText) {
             static int64_t OldText_width = 0;
 
             if ((Pos_X > Old_X) && (Old_Y == Pos_Y)) {
-                Pos_X = Old_X + OldText_width;
+                Pos_X = store_X1;
             }
 
             OldText_width = getDrawTextWidth(Text, ScaleX);
@@ -252,13 +316,59 @@ HOOK_DEFINE_TRAMPOLINE(DrawText) {
 
 };
 
+HOOK_DEFINE_TRAMPOLINE(DrawIcon) {
+    static void Callback(WinsIcon iconID, int Pos_X, int Pos_Y, int unk, float Scale, uint RGBA) {
+        ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
+        if (offset != 0x4EA94) //Message Window
+            return Orig(iconID, Pos_X, Pos_Y, unk, Scale, RGBA);
+        int width = Wins_GetIconWidth(iconID, (int)(Scale * 100));
+        store_X1 += width / 2;
+        Pos_X = store_X1;
+        Orig(iconID, Pos_X, Pos_Y, unk, Scale, RGBA);
+        store_X1 += width / 2;
+    }
+};
+
+int Backlog_LastX = 0;
+int Backlog_LastY = 0;
+
+HOOK_DEFINE_TRAMPOLINE(DrawSystemText) {
+    static void Callback(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float Scale, char const* Text) {
+        ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
+        if (offset == 0x4D5C || offset == 0x4EBC || offset == 0x5048) { //Backlog
+            if (Pos_Y != Backlog_LastY) {
+                Backlog_LastY = Pos_Y;
+                Backlog_LastX = Pos_X;
+            }
+            else Pos_X = Backlog_LastX;
+            Orig(Pos_X, Pos_Y, Pos_Z, w3, Scale, Text);
+            Backlog_LastX += getDrawTextWidth(Text, Scale);
+            return;
+        }
+        return Orig(Pos_X, Pos_Y, Pos_Z, w3, Scale, Text);
+    }
+};
+
+HOOK_DEFINE_TRAMPOLINE(DrawIconForBacklog) {
+    static void Callback(WinsIcon iconID, int Pos_X, int Pos_Y, int unk, float Scale, uint RGBA) {
+        if (Pos_Y != Backlog_LastY) {
+            Backlog_LastY = Pos_Y;
+            Backlog_LastX = Pos_X;
+        }
+        int width = Wins_GetIconWidth(iconID, (int)(Scale * 100));
+        Pos_X = Backlog_LastX;
+        Orig(iconID, Pos_X, Pos_Y, unk, Scale, RGBA);
+        Backlog_LastX += width;
+    }
+};
+
 HOOK_DEFINE_TRAMPOLINE(GetLastX) {
 
     static int32_t Callback(void) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
         auto offsetItr = -1;
 
-        if (ShinHaya1_set) {
+        if (ShinHaya_set == 1) {
             if (std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset) != SH1::GetLastXOffsets.end())
                 offsetItr = std::distance(SH1::GetLastXOffsets.begin(), std::find(SH1::GetLastXOffsets.begin(), SH1::GetLastXOffsets.end(), offset));
         }
@@ -325,6 +435,157 @@ HOOK_DEFINE_TRAMPOLINE(PutCodeTo) {
 
 };
 
+void* in_buffer = 0;
+
+HOOK_DEFINE_INLINE(LoadTex_start) {
+
+    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        std::string name = (const char*)(ctx -> X[2]);
+        name = name.substr(0, name.find(".nltx"));
+        char filepath[128] = "";
+        nn::fs::FileHandle filehandle;
+
+        if (ShinHaya_set == 1) {
+            snprintf(filepath, sizeof(filepath), "rom0:/Tfoaf1/Textures/%s.tga", name.c_str());
+        }
+        else if (ShinHaya_set == 2) {
+            snprintf(filepath, sizeof(filepath), "rom0:/Tfoaf2/Textures/%s.tga", name.c_str());
+        }
+        if (strlen(filepath) != 0) {
+            if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
+                long in_size = 0;
+                nn::fs::GetFileSize(&in_size, filehandle);
+                in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+                nn::fs::ReadFile(filehandle, 0, in_buffer, in_size);
+                nn::fs::CloseFile(filehandle);
+                ctx -> X[1] = (u64)in_buffer;
+            }
+        }
+        ctx->X[22] = ctx->X[1];
+        return;
+    }
+};
+
+bool ReplaceTexture(void** TexturePointer, uint16_t index, size_t texture_size, uint* width, uint* height, bool* isSwizzled) {
+
+		char filepath[128] = "";
+        if (!ShinHaya_set) {
+            snprintf(&filepath[0], 128, "rom0:/Textures/%04d.dds", index);
+        }
+        else if (ShinHaya_set == 1) {
+		    snprintf(&filepath[0], 128, "rom0:/Tfoaf1/Textures/anm0/%04d.dds", index);
+        }
+        else if (ShinHaya_set == 2) {
+		    snprintf(&filepath[0], 128, "rom0:/Tfoaf2/Textures/anm0/%04d.dds", index);
+        }
+        FILE* tex = FDKfopen(filepath, "rb");
+        if (tex) {
+            *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(texture_size);
+            FDKfseek(tex, 0xC, 0);
+            FDKfread(width, 4, 1, tex);
+            FDKfread(height, 4, 1, tex);
+            FDKfseek(tex, 0x40, 0);
+            FDKfread(isSwizzled, 1, 1, tex);
+            FDKfseek(tex, 0x54, 0);
+            uint32_t type = 0;
+            FDKfread(&type, 4, 1, tex);
+            FDKfseek(tex, ((type == 0x30315844) ? 0x94 : 0x80), 0);
+            FDKfread(*TexturePointer, texture_size, 1, tex);
+            FDKfclose(tex);
+            return true;
+        }
+        return false;
+}
+nn::os::MutexType _mutex;
+
+HOOK_DEFINE_TRAMPOLINE(Decompress) {
+    static void Callback(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, size_t unc_size) {
+        //nn::os::LockMutex(&_mutex);
+        static bool init = false;
+        if (!init) {
+            nn::fs::MountSdCardForDebug("sdmc");
+            init = true;
+        }
+        XXH64_hash_t hash_output = XXH3_64bits((void*)in_buffer, ((com_size < 0x1000) ? com_size : 0x1000));
+        auto index = compareHashes0(hash_output);
+        if (ShinHaya_set) index = compareHashes1(hash_output);
+        if (index.hash == hash_output) {
+            uint width = 0;
+            uint height = 0;
+            bool isSwizzled = false;
+            if (ReplaceTexture(out_buffer, index.fileID, unc_size, &width, &height, &isSwizzled)) {
+                if (isSwizzled) return;
+                unsigned int swWidth = width;
+                unsigned int swHeight = height;
+                if (index.swizzleExpand > 0 && index.swizzleType >= 3 && index.bytesPerPixel != 4) {
+                    swWidth = (index.swizzleExpand * 64) * (uint32_t)ceil((double)swWidth / (index.swizzleExpand * 64));
+                    swHeight = (index.swizzleExpand * 64) * (uint32_t)ceil((double)swHeight / (index.swizzleExpand * 64));
+                }
+                if (index.bytesPerPixel > 4) {
+                    width /= (index.bytesPerPixel / 4);
+                    height /= (index.bytesPerPixel / 4);
+                    swWidth /= (index.bytesPerPixel / 4);
+                    swHeight /= (index.bytesPerPixel / 4);
+                }
+                Swizzler sw = Swizzler(swWidth, index.bytesPerPixel, pow(2, index.swizzleType));
+                uint8_t* temp_buffer = (uint8_t*)*out_buffer;
+                size_t new_size = swWidth * swHeight * index.bytesPerPixel;
+                *out_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(new_size);
+                memset(*out_buffer, 0, new_size);
+                size_t offset = 0;
+                for (unsigned int y = 0; y < height; y++) {
+		            for (unsigned int x = 0; x < width; x++) {
+                        unsigned int off = sw.getOffset(x, y);
+                        memcpy((void*)&((uint8_t*)*out_buffer)[off], &temp_buffer[offset], index.bytesPerPixel);
+                        offset += index.bytesPerPixel;
+                    }
+                }
+
+                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(temp_buffer);
+                return;
+            }
+            
+        }
+        //nn::os::UnlockMutex(&_mutex);
+        return Orig(in_buffer, unc_size, out_buffer, unk, com_size);
+    }
+};
+
+uintptr_t tfoaf1_font_system_ptr = 0;
+
+HOOK_DEFINE_INLINE(ReplaceFont) {
+
+    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        if (ShinHaya_set == 1) {
+            XXH64_hash_t hash_output = XXH3_64bits((void*)(ctx->X[21]), 0x1000);
+            switch(hash_output) {
+                case 0x9091F51A7F73450Clu:
+                    if (tfoaf1_font_system_ptr) {
+                        ctx->X[21] = tfoaf1_font_system_ptr;
+                        ctx -> W[8] = *(uint16_t*)(ctx -> X[21]);
+                        return;
+                    }
+                    FILE* tex = FDKfopen("rom0:/Tfoaf1/font_system.bin", "rb");
+                    if (!tex) {
+                        ctx -> W[8] = *(uint16_t*)(ctx -> X[21]);
+                        return;
+                    }
+                    FDKfseek(tex, 0, 2);
+                    int new_size = FDKftell(tex);
+                    FDKfseek(tex, 0, 0);
+                    if (new_size > 5031598) {
+                        void* buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(new_size);
+                        ctx->X[21] = (u64)buffer;
+                    }
+                    tfoaf1_font_system_ptr = ctx->X[21];
+                    FDKfread((void*)ctx->X[21], new_size, 1, tex);
+                    FDKfclose(tex);
+            }
+        }
+        ctx -> W[8] = *(uint16_t*)(ctx -> X[21]);
+    }
+};
+
 HOOK_DEFINE_TRAMPOLINE(LoadModule) {
 
         static Result Callback(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
@@ -354,19 +615,40 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
             nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z16NmsCtl_PutCodeToP14_NMS_CTL_PARAMhh");
             PutCodeTo::InstallAtPtr(pointer);
 
+            //Fix drawing icons in Backlog
+            nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z23Wins_DrawIconForBackLog8WinsIconiiifj");
+            DrawIconForBacklog::InstallAtPtr(pointer);
+
+            nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z14DrawSystemTextiiijPKcf");
+            DrawSystemText::InstallAtPtr(pointer);
+
+            //Fix drawing icons in Messages
+            nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13Wins_DrawIcon8WinsIconiiifj");
+            DrawIcon::InstallAtPtr(pointer);
+            
+
             // Find symbol to determine NRO start pointer
             nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_ZN12clsNameInput16SetLastSelectStrEv");
 
             if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
-                ShinHaya1_set = true;
+                ShinHaya_set = 1;
                 NRO_Tfoaf_start = pointer - 0x7000;
             }
             else {
+                ShinHaya_set = 2;
                 NRO_Tfoaf_start = pointer - 0x76E0;
             }
                 
             return ret;
     }
+};
+
+namespace nn::fs {
+    /*
+        If not set to true, instead of returning result with error code
+        in case of any fs function failing, Application will abort.
+    */
+    Result SetResultHandledByApplication(bool enable);
 };
 
 
@@ -378,6 +660,17 @@ extern "C" void exl_main(void* x0, void* x1) {
     CMojiFontDraw::InstallAtFuncPtr(_ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE);
 
     LoadModule::InstallAtFuncPtr(nn::ro::LoadModule);
+
+    nn::fs::SetResultHandledByApplication(true);
+
+    LoadTex_start::InstallAtOffset(0x444F4);
+
+    Decompress::InstallAtFuncPtr(_ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj);
+
+    ReplaceFont::InstallAtOffset(0x6FA7C);
+
+    memset(&_mutex, 0, sizeof(_mutex));
+    nn::os::InitializeMutex(&_mutex, false, 1);
 
     /* Alternative install funcs: */
     /* InstallAtPtr takes an absolute address as a uintptr_t. */
