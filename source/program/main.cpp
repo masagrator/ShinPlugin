@@ -8,10 +8,10 @@
 #include "TextView_Render.hpp"
 #include "xxHash/xxhash.h"
 #include "textureHashes.hpp"
-#include "nn/fs.hpp"
 #include "nn/os.hpp"
-#include <cstdio>
 #include <cmath>
+#include "nn/util/util_gzip.hpp"
+#include "nn/util/util_snprintf.hpp"
 
 int countLSBZeros(int value) {
 	unsigned int c = 0;
@@ -435,8 +435,6 @@ HOOK_DEFINE_TRAMPOLINE(PutCodeTo) {
 
 };
 
-void* in_buffer = 0;
-
 HOOK_DEFINE_INLINE(LoadTex_start) {
 
     static void Callback(exl::hook::nx64::InlineCtx* ctx) {
@@ -446,19 +444,37 @@ HOOK_DEFINE_INLINE(LoadTex_start) {
         nn::fs::FileHandle filehandle;
 
         if (ShinHaya_set == 1) {
-            snprintf(filepath, sizeof(filepath), "rom0:/Tfoaf1/Textures/%s.tga", name.c_str());
+            nn::util::SNPrintf(filepath, sizeof(filepath), "rom0:/Tfoaf1/Textures/%s.tga.gz", name.c_str());
         }
         else if (ShinHaya_set == 2) {
-            snprintf(filepath, sizeof(filepath), "rom0:/Tfoaf2/Textures/%s.tga", name.c_str());
+            nn::util::SNPrintf(filepath, sizeof(filepath), "rom0:/Tfoaf2/Textures/%s.tga.gz", name.c_str());
         }
         if (strlen(filepath) != 0) {
             if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
-                long in_size = 0;
-                nn::fs::GetFileSize(&in_size, filehandle);
-                in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
-                nn::fs::ReadFile(filehandle, 0, in_buffer, in_size);
+                long com_size = 0;
+                nn::fs::GetFileSize(&com_size, filehandle);
+                void* com_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(com_size);
+                nn::fs::ReadFile(filehandle, 0, com_buffer, com_size);
                 nn::fs::CloseFile(filehandle);
-                ctx -> X[1] = (u64)in_buffer;
+                size_t in_size = nn::util::GetGzipDecompressedSize(com_buffer, com_size);
+                void* in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+                char workBuffer[nn::util::DecompressGzipWorkBufferSize] = "";
+                if (nn::util::DecompressGzip(in_buffer, in_size, com_buffer, com_size, (void*)workBuffer, sizeof(workBuffer))) {
+                    ctx -> X[1] = (u64)in_buffer;
+                }
+                else _ZN4Nmpl15MemoryInterface10freeMemoryEPv(in_buffer);
+                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+            }
+            else {
+                filepath[strlen(filepath)-3] = 0;
+                if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
+                    long in_size = 0;
+                    nn::fs::GetFileSize(&in_size, filehandle);
+                    void* in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+                    nn::fs::ReadFile(filehandle, 0, in_buffer, in_size);
+                    nn::fs::CloseFile(filehandle);
+                    ctx -> X[1] = (u64)in_buffer;
+                }
             }
         }
         ctx->X[22] = ctx->X[1];
@@ -470,37 +486,80 @@ bool ReplaceTexture(void** TexturePointer, uint16_t index, size_t texture_size, 
 
 		char filepath[128] = "";
         if (!ShinHaya_set) {
-            snprintf(&filepath[0], 128, "rom0:/Textures/%04d.dds", index);
+            nn::util::SNPrintf(&filepath[0], 128, "rom0:/Textures/%04d.dds.gz", index);
         }
         else if (ShinHaya_set == 1) {
-		    snprintf(&filepath[0], 128, "rom0:/Tfoaf1/Textures/anm0/%04d.dds", index);
+		    nn::util::SNPrintf(&filepath[0], 128, "rom0:/Tfoaf1/Textures/anm0/%04d.dds.gz", index);
         }
         else if (ShinHaya_set == 2) {
-		    snprintf(&filepath[0], 128, "rom0:/Tfoaf2/Textures/anm0/%04d.dds", index);
+		    nn::util::SNPrintf(&filepath[0], 128, "rom0:/Tfoaf2/Textures/anm0/%04d.dds.gz", index);
         }
+
         FILE* tex = FDKfopen(filepath, "rb");
         if (tex) {
-            *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(texture_size);
-            FDKfseek(tex, 0xC, 0);
-            FDKfread(width, 4, 1, tex);
-            FDKfread(height, 4, 1, tex);
-            FDKfseek(tex, 0x40, 0);
-            FDKfread(isSwizzled, 1, 1, tex);
-            FDKfseek(tex, 0x54, 0);
-            uint32_t type = 0;
-            FDKfread(&type, 4, 1, tex);
-            FDKfseek(tex, ((type == 0x30315844) ? 0x94 : 0x80), 0);
-            FDKfread(*TexturePointer, texture_size, 1, tex);
+            FDKfseek(tex, 0, 2);
+            long com_size = FDKftell(tex);
+            FDKfseek(tex, 0, 0);
+            void* com_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(com_size);
+            FDKfread(com_buffer, com_size, 1, tex);
             FDKfclose(tex);
+            
+            size_t in_size = nn::util::GetGzipDecompressedSize(com_buffer, com_size);
+            *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+            if (!*TexturePointer) {
+                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+                return false;
+            }
+            char workBuffer[nn::util::DecompressGzipWorkBufferSize] = "";
+            if (!nn::util::DecompressGzip(*TexturePointer, in_size, com_buffer, com_size, (void*)workBuffer, sizeof(workBuffer))) {
+                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(*TexturePointer);
+                return false;
+            }
+            _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+
+            uint8_t* buffer = (uint8_t*)*TexturePointer;
+            memcpy((void*)width, (void*)&buffer[0xC], 4);
+            memcpy((void*)height, (void*)&buffer[0x10], 4);
+            memcpy((void*)isSwizzled, (void*)&buffer[0x40], 1);
+            uint32_t type = 0;
+            memcpy((void*)&type, (void*)&buffer[0x54], 4);
+            memcpy((void*)buffer, (void*)&buffer[((type == 0x30315844) ? 0x94 : 0x80)], *width * *height);
             return true;
+        }
+        else {
+            filepath[strlen(filepath)-3] = 0;
+            tex = FDKfopen(filepath, "rb");
+            if (tex) {
+                *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(texture_size);
+                FDKfseek(tex, 0xC, 0);
+                FDKfread(width, 4, 1, tex);
+                FDKfread(height, 4, 1, tex);
+                FDKfseek(tex, 0x40, 0);
+                FDKfread(isSwizzled, 1, 1, tex);
+                FDKfseek(tex, 0x54, 0);
+                uint32_t type = 0;
+                FDKfread(&type, 4, 1, tex);
+                FDKfseek(tex, ((type == 0x30315844) ? 0x94 : 0x80), 0);
+                FDKfread(*TexturePointer, texture_size, 1, tex);
+                FDKfclose(tex);
+                return true;
+            }
         }
         return false;
 }
+
+//#define mutex_on
+
+#ifdef mutex_on
 nn::os::MutexType _mutex;
+#endif
 
 HOOK_DEFINE_TRAMPOLINE(Decompress) {
     static void Callback(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, size_t unc_size) {
-        //nn::os::LockMutex(&_mutex);
+        #ifdef mutex_on
+        nn::os::LockMutex(&_mutex);
+        #endif
         static bool init = false;
         if (!init) {
             nn::fs::MountSdCardForDebug("sdmc");
@@ -542,11 +601,16 @@ HOOK_DEFINE_TRAMPOLINE(Decompress) {
                 }
 
                 _ZN4Nmpl15MemoryInterface10freeMemoryEPv(temp_buffer);
+                #ifdef mutex_on
+                nn::os::UnlockMutex(&_mutex);
+                #endif
                 return;
             }
             
         }
-        //nn::os::UnlockMutex(&_mutex);
+        #ifdef mutex_on
+        nn::os::UnlockMutex(&_mutex);
+        #endif
         return Orig(in_buffer, unc_size, out_buffer, unk, com_size);
     }
 };
@@ -669,8 +733,10 @@ extern "C" void exl_main(void* x0, void* x1) {
 
     ReplaceFont::InstallAtOffset(0x6FA7C);
 
+    #ifdef mutex_on
     memset(&_mutex, 0, sizeof(_mutex));
     nn::os::InitializeMutex(&_mutex, false, 1);
+    #endif
 
     /* Alternative install funcs: */
     /* InstallAtPtr takes an absolute address as a uintptr_t. */
