@@ -659,9 +659,24 @@ HOOK_DEFINE_INLINE(ReplaceFont) {
     }
 };
 
-HOOK_DEFINE_INLINE(NOP) {
+HOOK_DEFINE_INLINE(NOP1_1) {
 
     static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        return;
+    }
+};
+
+HOOK_DEFINE_INLINE(NOP1_2) {
+
+    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        return;
+    }
+};
+
+HOOK_DEFINE_INLINE(NOP2) {
+
+    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        ctx->W[21] = *(uint32_t*)(((ctx->X[25] * ctx->X[22]) + ctx->X[19]) + 0xD0);
         return;
     }
 };
@@ -713,22 +728,10 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
             if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
                 ShinHaya_set = 1;
                 NRO_Tfoaf_start = pointer - 0x7000;
-                // Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x536E0);
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x53CBC);
-                /*Offset that NOPped is blocking writing CompletionMark X offset by game.
-                Check DrawText hook that is taking job of writing X offset.*/
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x37CAC);
             }
             else {
                 ShinHaya_set = 2;
                 NRO_Tfoaf_start = pointer - 0x76E0;
-                // Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x5831C);
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x58B68);
-                /*Offset that NOPped is blocking writing CompletionMark X offset by game.
-                Check DrawText hook that is taking job of writing X offset.*/
-                NOP::InstallAtPtr(NRO_Tfoaf_start+0x3CFE8);
             }
                 
             return ret;
