@@ -6,7 +6,8 @@ namespace SH1 {
         0x387A0, //After Select
         0x46F94, //FOAF popup
         0x4E6A4, //Animated Text
-        0x4EFAC  //Static Text
+        0x4EFAC, //Static Text
+        0x36490  //Tutorial Select
     };
 
     // Those offsets are used for Ruby to calculate middle of text
@@ -14,6 +15,8 @@ namespace SH1 {
         0x46128, // Keyword Start
         0x46298 // Keyword End
     };
+
+    ptrdiff_t FOAF_popup_offset = 0x46F70;
 }
 
 namespace SH2 {
