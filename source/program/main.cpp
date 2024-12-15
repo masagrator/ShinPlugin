@@ -138,6 +138,15 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                 free(checkJPN);
                 return;
             }
+            else if (offset == SH1::FOAF_popup_offset) {
+                char* checkJPN = (char*)calloc(1, bufferSize);
+                Orig(src, bufferSize, checkJPN);
+                if (!strncmp("…", checkJPN, sizeof("…")))
+                    Orig("...", bufferSize, dst);
+                else Orig(src, bufferSize, dst);
+                free(checkJPN);
+                return;
+            }
             else if (std::find(SH1::TreeOffsets.begin(), SH1::TreeOffsets.end(), offset) != SH1::TreeOffsets.end()) {
                 auto offsetItr = std::distance(SH1::TreeOffsets.begin(),
                                 std::find(SH1::TreeOffsets.begin(), SH1::TreeOffsets.end(), offset));

@@ -1,7 +1,8 @@
 #include "Tree.hpp"
 
 std::array YesNo_data = {
-    Text{"ここから再開しますか？", "Do you wish to resume the story from here?"}
+    Text{"ここから再開しますか？", "Do you wish to resume the story from here?"},
+    Text{"入力を中止しますか？", "Do you want to return?"}
 };
 std::span<Text> YesNo(YesNo_data);
 
