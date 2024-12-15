@@ -682,13 +682,13 @@ namespace SH1 {
     std::span<Text> Tree2C(Tree2C_data);
 
     std::array Tree4C_data = {
-        Text{"疑問を口にしてみる", "I'm going to speak my mind"},
-        Text{"皮肉を言う", "speak cynically"},
+        Text{"疑問を口にしてみる", "Speak my mind"},
+        Text{"皮肉を言う", "Speak cynically"},
         Text{"答えなさい！", "Answer me!"},
         Text{"関本に会いに行く", "I'm going to see Sekimoto"},
         Text{"刑事告訴ものです", "That's a criminal complaint"},
         Text{"怒る", "Get Angry"},
-        Text{"疑問を口にしてみる", "I'm going to speak my mind"},
+        Text{"疑問を口にしてみる", "Speak my mind"},
         Text{"言葉を飲み込んだ", "Swallowed Words"},
         Text{"刑事告訴ものです", "That's a criminal complaint"},
         Text{"怒る", "Get Angry"},
@@ -775,13 +775,13 @@ namespace SH1 {
     std::span<Text> Tree4C(Tree4C_data);
 
     std::array Tree8C_data = {
-        Text{"怒らせてみる", "I'll try to make him angry"},
+        Text{"怒らせてみる", "Try to annoy him"},
         Text{"しかりつける", "Scold Harshly"},
         Text{"私の負けよ", "I've lost"},
         Text{"その必要はない", "No need for that"},
         Text{"復讐をするでしょう", "He'll have his revenge"},
         Text{"騒ぐ", "Be noisy"},
-        Text{"怒らせてみる", "I'll try to make him angry"},
+        Text{"怒らせてみる", "Try to annoy him"},
         Text{"皮肉を言う", "Speak Cynically"},
         Text{"民事賠償ものです", "Civil damages"},
         Text{"騒ぐ", "Be Noisy"},

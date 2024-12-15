@@ -154,17 +154,17 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                         break;
                     case 1:
                         if (!ReplaceSJIStoUTF8(SH1::Tree4C, src, dst, bufferSize, 
-                            std::find_if(SH1::Tree2C.begin(), SH1::Tree4C.end(), find_JPN(checkJPN))))
+                            std::find_if(SH1::Tree4C.begin(), SH1::Tree4C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 2:
                         if (!ReplaceSJIStoUTF8(SH1::Tree8C, src, dst, bufferSize, 
-                            std::find_if(SH1::Tree2C.begin(), SH1::Tree8C.end(), find_JPN(checkJPN))))
+                            std::find_if(SH1::Tree8C.begin(), SH1::Tree8C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 3:
                         if (!ReplaceSJIStoUTF8(SH1::TreeCC, src, dst, bufferSize, 
-                            std::find_if(SH1::Tree2C.begin(), SH1::TreeCC.end(), find_JPN(checkJPN))))
+                            std::find_if(SH1::TreeCC.begin(), SH1::TreeCC.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                 }
