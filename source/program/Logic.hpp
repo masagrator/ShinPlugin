@@ -20,7 +20,7 @@ namespace SH1 {
 		Text{"風守隼人（かざもり・はやと）", "Kazamori Hayato"},
 		Text{"思った事がすぐ口に出てしまう。", "Can't help but think out loud."},
 		Text{"立花美鈴（たちばな・みすず）", "Tachibana Misuzu"},
-		Text{"ブラインドマン", "Blind Man"},
+		Text{"ブラインドマン", "Blindman"},
 		Text{"関本爽二朗（せきもと・そうじろう）", "Sekimoto Soujirou"},
 		Text{"津田沼陽一（つだぬま・よういち）", "Tsudanuma Youichi"},
 		Text{"金谷大夢（かなや・ひろむ）","Kanaya Hiromu"},
@@ -44,19 +44,19 @@ namespace SH1 {
 		Text{"関本は地下牢の悪魔だ", "Sekimoto is the Devil in the Dungeon."},
 
 		Text{"空欄のまま保留た牧師だ", "Blank, Pending Investigation."},
-		Text{"ブラインドマンの正体は私だ", "The Blind Man's true identity is Me."},
-		Text{"ブラインドマンの正体は風守さんだ", "The Blind Man's true identity is Kazamori"},
-		Text{"ブラインドマンの正体は黒田課長だ", "The Blind Man's true identity is Kuroda"},
-		Text{"ブラインドマンの正体は関本だ", "The Blind Man's true identity is Sekimoto"},
-		Text{"ブラインドマンの正体は美鈴だ", "The Blind Man's true identity is Tachibana"},
-		Text{"ブラインドマンの正体は遥さんだ", "The Blind Man's true identity is Haruka"},
-		Text{"ブラインドマンの正体は砂堀さんだ", "The Blind Man's true identity is Sunahori"},
-		Text{"ブラインドマンの正体は優子さんだ", "The Blind Man's true identity is Yuuko"},
-		Text{"ブラインドマンの正体は聡史くんだ", "The Blind Man's true identity is Satoshi"},
-		Text{"ブラインドマンの正体は早苗さんだ", "The Blind Man's true identity is Sanae"},
-		Text{"ブラインドマンの正体は津田沼さんだ", "The Blind Man's true identity is Tsudanuma"},
-		Text{"ブラインドマンの正体は竹中慎一郎だ", "The Blind Man's true identity is Takenaka.S"},
-		Text{"ブラインドマンの正体は亘さんだだ", "The Blind Man's true identity is Watari"},
+		Text{"ブラインドマンの正体は私だ", "The Blindman's true identity is Me."},
+		Text{"ブラインドマンの正体は風守さんだ", "The Blindman's true identity is Kazamori"},
+		Text{"ブラインドマンの正体は黒田課長だ", "The Blindman's true identity is Kuroda"},
+		Text{"ブラインドマンの正体は関本だ", "The Blindman's true identity is Sekimoto"},
+		Text{"ブラインドマンの正体は美鈴だ", "The Blindman's true identity is Tachibana"},
+		Text{"ブラインドマンの正体は遥さんだ", "The Blindman's true identity is Haruka"},
+		Text{"ブラインドマンの正体は砂堀さんだ", "The Blindman's true identity is Sunahori"},
+		Text{"ブラインドマンの正体は優子さんだ", "The Blindman's true identity is Yuuko"},
+		Text{"ブラインドマンの正体は聡史くんだ", "The Blindman's true identity is Satoshi"},
+		Text{"ブラインドマンの正体は早苗さんだ", "The Blindman's true identity is Sanae"},
+		Text{"ブラインドマンの正体は津田沼さんだ", "The Blindman's true identity is Tsudanuma"},
+		Text{"ブラインドマンの正体は竹中慎一郎だ", "The Blindman's true identity is Takenaka."},
+		Text{"ブラインドマンの正体は亘さんだだ", "The Blindman's true identity is Watari"},
 
 		Text{"空欄のまま保留正体は金谷大夢だ", "Blank, Pending Investigation."},
 		Text{"遥さんと田村さんは友人関係だった", "Haruka and Tamura were best friends."},
@@ -70,12 +70,12 @@ namespace SH1 {
 		Text{"田村さんは砂堀さんに貸し剥がしをした", "Tamura stripped Sunahori of his debt."},
 		Text{"砂堀さんは田村さんに殴り込みに行った", "Sunahori went to confront Tamura."},
 		Text{"砂堀さんは田村さんに土下座した", "Sunahori got down on his knees to Tamura."},
-		Text{"砂堀さんは田村さんに怨恨があった", "砂堀さんは田村さんに怨恨があった"},
+		Text{"砂堀さんは田村さんに怨恨があった", "Sunahori had a grudge against Tamura."},
 
 		Text{"空欄のまま保留んに怨恨があったた", "Blank, Pending Investigation."},
 		Text{"牧村さんは田村さんに怨恨があった", "Makimura had a grudge against Tamura."},
 		Text{"牧村さんは田村さんと面識がなかった", "Makimura had never met Tamura."},
-		Text{"牧村さんは田村さんの保険金が目的だった", "牧村さんは田村さんの保険金が目的だった"},
+		Text{"牧村さんは田村さんの保険金が目的だった", "Makimura was after Tamura's insurance money."},
 
 		Text{"空欄のまま保留んの保険金が目的だった", "Blank, Pending Investigation."},
 		Text{"津田沼さんはスクープを欲しがっている", "Tsudanuma wants the scoop."},
@@ -86,18 +86,97 @@ namespace SH1 {
 		Text{"金谷大夢は偉大なる小説家だつもりだいる", "Kanaya Hiromu is a great novelist."},
 		Text{"金谷大夢の正体は餓鬼だったつもりだいる", "Kanaya Hiromu is a Brat."},
 
-		Text{"空欄のまま保留毒者だったつもりだいる", "空欄のまま保留毒者だったつもりだいる"},
-		Text{"遥さんと金谷大夢は共犯だったもりだいる", "遥さんと金谷大夢は共犯だったもりだいる"},
-		Text{"遥さんにとって金谷大夢は都合のいい客だった", "遥さんにとって金谷大夢は都合のいい客だった"},
-		Text{"遥さんは金谷大夢から札束を受け取っていた", "遥さんは金谷大夢から札束を受け取っていた"},
-		Text{"遥さんは汚物処理担当として金谷大夢に接していた", "遥さんは汚物処理担当として金谷大夢に接していた"},
+		Text{"空欄のまま保留毒者だったつもりだいる", "Blank, Pending Investigation."},
+		Text{"遥さんと金谷大夢は共犯だったもりだいる", "Haruka & Kanaya were accomplices."},
+		Text{"遥さんにとって金谷大夢は都合のいい客だった", "To Haruka, Kanaya was a convenient customer."},
+		Text{"遥さんは金谷大夢から札束を受け取っていた", "Haruka had received a wad of cash from Kanaya."},
+		Text{"遥さんは汚物処理担当として金谷大夢に接していた", "Haruka was treating Kanaya as the one in charge of filth."},
 
 		Text{"空欄のまま保留にダイエット薬品を渡していた", "Blank, Pending Investigation."},
-		Text{"ブラインドマンと金谷大夢は共犯だったていた", "The Blind Man & Kanaya are accomplices."},
-		Text{"ブラインドマンは金谷大夢にダイエット薬品を渡していた", "The Blind Man was giving Kanaya the Diet Pills."},
-		Text{"ブラインドマンは金谷大夢を身代わりにさせたしていた", "The Blind Man had Kanaya take his place."}
+		Text{"ブラインドマンと金谷大夢は共犯だったていた", "The Blindman & Kanaya are accomplices."},
+		Text{"ブラインドマンは金谷大夢にダイエット薬品を渡していた", "The Blindman was giving Kanaya the Diet Pills."},
+		Text{"ブラインドマンは金谷大夢を身代わりにさせたしていた", "The Blindman had Kanaya take his place."}
 	};
 	std::span<Text> Logic(Logic_data);
+
+	ptrdiff_t LogicDescriptionsOffset = 0x1C7B8;
+
+	std::array LogicDescriptions_data = {
+		//Index 0
+		Text{"HoujouSaki", "Houjou Saki"},
+		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", ""},
+		Text{"階級は巡査。", ""},
+
+		Text{"黒田邦雄（くろだ・くにお）", "Kuroda Kunio"},
+		Text{"５２歳。特ラ課の上司。階級は警部。役職は課長。", ""},
+		Text{"いつも笑みを絶やさないのが魅力でもあり怖さでもある。", ""},
+
+		Text{"風守隼人（かざもり・はやと）", "Kazamori Hayato"},
+		Text{"２８歳。特ラ課の先輩。階級は巡査部長。", ""},
+		Text{"思った事がすぐ口に出てしまう。", ""},
+		Text{"ホットサンドが大好物。", ""},
+
+		Text{"立花美鈴（たちばな・みすず）", "Tachibana Misuzu"},
+		Text{"私の同期で鑑識課に所属。", ""},
+		Text{"目で見たものしか信じない現実主義者。", ""},
+
+		Text{"関本爽二朗（せきもと・そうじろう）", "Sekimoto Soujirou"},
+		Text{"３６歳。殺人容疑で公判中の元大学教授。", ""},
+		Text{"民俗学、主に都市伝説を専攻していた。", ""},
+
+		Text{"水瀬遥（みなせ・はるか）", "Minase Haruka"},
+		Text{"女子大生。首筋に生々しい青あざがある。", ""},
+		Text{"生活費を稼ぐために夜のお店で働いているらしい。", ""},
+
+		Text{"砂堀聡史（すなほり・さとし）", "Sunahori Satoshi"},
+		Text{"砂堀酒造の息子。", ""},
+
+		Text{"砂堀優子（すなほり・ゆうこ）", "Sunahori Yuuko"},
+		Text{"砂堀将春の妻。", ""},
+
+		Text{"砂堀将春（すなほり・まさはる）", "Sunahori Masaharu"},
+		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", ""},
+		Text{"風守さんとは馬が合わないようだ。", ""},
+
+		Text{"田村光太郎（たむら・こうたろう）", "Tamura Koutarou"},
+		Text{"銀行員。男性。３５歳。", ""},
+		Text{"両目を鋏で貫かれ殺害された。", ""},
+		Text{"各方面でトラブルの種を抱えていたようだ。", ""},
+
+		Text{"牧村早苗（まきむら・さなえ）", "Makimura Sanae"},
+		Text{"Ｃ村の福祉施設に勤める介護学生。", ""},
+		Text{"Ｃ村で起きていた多数の行方不明事件、", ""},
+		Text{"その行方不明者を殺害していたという。", ""},
+
+		Text{"Ｃ村の福祉施設の理事長。", ""},
+		Text{"経営不振の責任をとって自殺したらしい。", ""},
+
+		Text{"津田沼陽一（つだぬま・よういち）", "Tsudanuma Youichi"},
+		Text{"フリージャーナリスト。", ""},
+
+		Text{"亘胡桃（わたり・くるみ）", "Watari Kuromi"},
+		Text{"７８歳。福祉施設を住所とする老婆。", ""},
+		Text{"両目に鋏を突き刺され死亡。", ""},
+
+		Text{"竹中浩三（たけなか・こうぞう）", "Takenaka Kouzou"},
+		Text{"５８歳。竹中慎一郎の父。", ""},
+		Text{"遺体となって発見された。", ""},
+
+		Text{"竹中千鶴子（たけなか・ちづこ）", "Takenaka Chizuko"},
+		Text{"５５歳。竹中慎一郎の母。", ""},
+		Text{"遺体となって発見された。", ""},
+
+		Text{"竹中慎一郎（たけなか・しんいちろう）", "Takenaka Shinichirou"},
+		Text{"２８歳。関本の下に在籍していた元研究員。", ""},
+		Text{"現在の職業は不詳。", ""},
+		Text{"両親と共に遺体となって発見された。", ""},
+
+		Text{"ブラインドマン", "Blindman"},
+		Text{"都市伝説に登場する架空の人物。", ""},
+		Text{"『光を奪う者』という意味を込めて名付けられたらしい。", ""}
+	};
+
+	std::span<Text> LogicDescriptions(LogicDescriptions_data);
 }
 
 namespace SH2 {

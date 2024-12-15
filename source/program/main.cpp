@@ -115,6 +115,8 @@ HOOK_DEFINE_TRAMPOLINE(CMojiFontDraw) {
 
 bool ReplaceSJIStoUTF8(std::span<Text> Vector, const char* src, char* dst, int bufferSize, std::span<Text>::iterator itr) {
 	if (itr != Vector.end() && strlen(itr->ENG) <= (size_t)bufferSize) {
+        if (!strlen(itr->ENG))
+            return false;
 		memcpy(dst, itr->ENG, strlen(itr->ENG));
 		return true;
 	}
@@ -133,6 +135,17 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
 
                 if (!ReplaceSJIStoUTF8(SH1::Logic, src, dst, bufferSize,
                     std::find_if(SH1::Logic.begin(), SH1::Logic.end(), find_JPN(checkJPN))))
+                    Orig(src, bufferSize, dst);
+                
+                free(checkJPN);
+                return;
+            }
+            else if (offset == SH1::LogicDescriptionsOffset) {
+                char* checkJPN = (char*)calloc(1, bufferSize);
+                Orig(src, bufferSize, checkJPN);
+
+                if (!ReplaceSJIStoUTF8(SH1::LogicDescriptions, src, dst, bufferSize,
+                    std::find_if(SH1::LogicDescriptions.begin(), SH1::LogicDescriptions.end(), find_JPN(checkJPN))))
                     Orig(src, bufferSize, dst);
                 
                 free(checkJPN);
