@@ -319,8 +319,12 @@ HOOK_DEFINE_TRAMPOLINE(DrawText) {
 HOOK_DEFINE_TRAMPOLINE(DrawIcon) {
     static void Callback(WinsIcon iconID, int Pos_X, int Pos_Y, int unk, float Scale, uint RGBA) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
-        if (offset != 0x4EA94) //Message Window
+        if (ShinHaya_set == 1 && offset != 0x4EA94) {
             return Orig(iconID, Pos_X, Pos_Y, unk, Scale, RGBA);
+        }
+        if (ShinHaya_set == 2) {
+            return Orig(iconID, Pos_X, Pos_Y, unk, Scale, RGBA);
+        }
         int width = Wins_GetIconWidth(iconID, (int)(Scale * 100));
         store_X1 += width / 2;
         Pos_X = store_X1;
@@ -335,15 +339,20 @@ int Backlog_LastY = 0;
 HOOK_DEFINE_TRAMPOLINE(DrawSystemText) {
     static void Callback(int Pos_X, int Pos_Y, int Pos_Z, unsigned int w3, float Scale, char const* Text) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
-        if (offset == 0x4D5C || offset == 0x4EBC || offset == 0x5048) { //Backlog
-            if (Pos_Y != Backlog_LastY) {
-                Backlog_LastY = Pos_Y;
-                Backlog_LastX = Pos_X;
+        if (ShinHaya_set == 1) {
+            switch(offset) {
+                case 0x4D5C: //Backlog
+                case 0x4EBC: //Backlog
+                case 0x5048: //Backlog {
+                    if (Pos_Y != Backlog_LastY) {
+                        Backlog_LastY = Pos_Y;
+                        Backlog_LastX = Pos_X;
+                    }
+                    else Pos_X = Backlog_LastX;
+                    Orig(Pos_X, Pos_Y, Pos_Z, w3, Scale, Text);
+                    Backlog_LastX += getDrawTextWidth(Text, Scale);
+                    return;
             }
-            else Pos_X = Backlog_LastX;
-            Orig(Pos_X, Pos_Y, Pos_Z, w3, Scale, Text);
-            Backlog_LastX += getDrawTextWidth(Text, Scale);
-            return;
         }
         return Orig(Pos_X, Pos_Y, Pos_Z, w3, Scale, Text);
     }
@@ -650,6 +659,13 @@ HOOK_DEFINE_INLINE(ReplaceFont) {
     }
 };
 
+HOOK_DEFINE_INLINE(NOP) {
+
+    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
+        return;
+    }
+};
+
 HOOK_DEFINE_TRAMPOLINE(LoadModule) {
 
         static Result Callback(nn::ro::Module* pOutModule, const void* pImage, void* buffer, size_t bufferSize, int flag) {
@@ -697,10 +713,22 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
             if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
                 ShinHaya_set = 1;
                 NRO_Tfoaf_start = pointer - 0x7000;
+                // Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x536E0);
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x53CBC);
+                /*Offset that NOPped is blocking writing CompletionMark X offset by game.
+                Check DrawText hook that is taking job of writing X offset.*/
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x37CAC);
             }
             else {
                 ShinHaya_set = 2;
                 NRO_Tfoaf_start = pointer - 0x76E0;
+                // Offsets that NOPped are forcing game to use for MC name string from gamestrings instead of user name
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x5831C);
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x58B68);
+                /*Offset that NOPped is blocking writing CompletionMark X offset by game.
+                Check DrawText hook that is taking job of writing X offset.*/
+                NOP::InstallAtPtr(NRO_Tfoaf_start+0x3CFE8);
             }
                 
             return ret;
