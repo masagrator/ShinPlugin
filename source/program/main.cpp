@@ -88,7 +88,7 @@ extern "C" {
     typedef void (*SjisToUtf8)(char const* src, int bufferSize, char* dst);
     void* _ZN4Nmpl15MemoryInterface14allocateMemoryEm(size_t size);
     void _ZN4Nmpl15MemoryInterface10freeMemoryEPv(void* buffer);
-    void _ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj(uint8_t* in_buffer, size_t unc_size, void** out_buffer, uint32_t* unk, size_t com_size);
+    void _ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, uint32_t unc_size);
     FILE* FDKfopen(const char * filename, const char * mode);
     int FDKfclose(FILE* stream);
     int FDKfprintf(FILE* stream, const char* format, ...);
@@ -587,15 +587,12 @@ nn::os::MutexType _mutex;
 #endif
 
 HOOK_DEFINE_TRAMPOLINE(Decompress) {
-    static void Callback(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, size_t unc_size) {
+    static void Callback(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, uint32_t unc_size) {
         #ifdef mutex_on
         nn::os::LockMutex(&_mutex);
         #endif
-        static bool init = false;
-        if (!init) {
-            nn::fs::MountSdCardForDebug("sdmc");
-            init = true;
-        }
+        if (unc_size == 0xFFFFFFFF) //This is used for saves
+            return Orig(in_buffer, com_size, out_buffer, unk, unc_size);
         XXH64_hash_t hash_output = XXH3_64bits((void*)in_buffer, ((com_size < 0x1000) ? com_size : 0x1000));
         auto index = compareHashes0(hash_output);
         if (ShinHaya_set) index = compareHashes1(hash_output);
@@ -642,7 +639,7 @@ HOOK_DEFINE_TRAMPOLINE(Decompress) {
         #ifdef mutex_on
         nn::os::UnlockMutex(&_mutex);
         #endif
-        return Orig(in_buffer, unc_size, out_buffer, unk, com_size);
+        return Orig(in_buffer, com_size, out_buffer, unk, unc_size);
     }
 };
 
@@ -678,28 +675,6 @@ HOOK_DEFINE_INLINE(ReplaceFont) {
             }
         }
         ctx -> W[8] = *(uint16_t*)(ctx -> X[21]);
-    }
-};
-
-HOOK_DEFINE_INLINE(NOP1_1) {
-
-    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
-        return;
-    }
-};
-
-HOOK_DEFINE_INLINE(NOP1_2) {
-
-    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
-        return;
-    }
-};
-
-HOOK_DEFINE_INLINE(NOP2) {
-
-    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
-        ctx->W[21] = *(uint32_t*)(((ctx->X[25] * ctx->X[22]) + ctx->X[19]) + 0xD0);
-        return;
     }
 };
 
