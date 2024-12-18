@@ -68,7 +68,7 @@ struct find_JPN {
 	find_JPN(const char* JPN) : JPN(JPN) {}
 	bool operator () ( const Text& m ) const
 	{
-		return !strncmp(m.JPN, JPN, strlen(m.JPN));
+		return !strncmp(m.JPN, JPN, strlen(JPN));
 	}
 };
 
