@@ -874,7 +874,7 @@ namespace SH1 {
         Text{"復讐をするでしょう", "He will have his revenge"},
         Text{"おどける", "Joke"},
         Text{"歯が残っている", "Teeth still intact"},
-        Text{"様子を見る", "wait and see"},
+        Text{"様子を見る", "Wait and see"},
         Text{"話しかける", "Speak up"},
         Text{"怖がる", "Fear"},
         Text{"見くびらないで下さい", "Don't underestimate me"},

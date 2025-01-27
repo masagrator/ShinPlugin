@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "Tree.hpp"
 #include "Logic.hpp"
+#include "Phrase.hpp"
 #include "YesNo.hpp"
 #include "TextView_Render.hpp"
 #include "xxHash/xxhash.h"
@@ -12,6 +13,7 @@
 #include <cmath>
 #include "nn/util/util_gzip.hpp"
 #include "nn/util/util_snprintf.hpp"
+#include <unordered_map>
 
 int countLSBZeros(int value) {
 	unsigned int c = 0;
@@ -75,6 +77,7 @@ struct find_JPN {
 uintptr_t NRO_Tfoaf_start = 0;
 uint8_t ShinHaya_set = 0;
 uintptr_t SJIStoUTF8_origin = 0;
+uintptr_t UTF8toSJIS_origin = 0;
 uintptr_t gpStartArchive = 0;
 
 struct textureInfo {
@@ -86,8 +89,9 @@ extern "C" {
 	// This function has only one argument, but two more are used to fix issue with segfault
 	void _ZN4Nmpl9Framework7GraUtil13CMojiFontDrawC1ERNS1_9CMojiFontE(CMojiFont* fontPtr, void* unk1, void* unk2);
     typedef void (*SjisToUtf8)(char const* src, int bufferSize, char* dst);
-    void* _ZN4Nmpl15MemoryInterface14allocateMemoryEm(size_t size);
-    void _ZN4Nmpl15MemoryInterface10freeMemoryEPv(void* buffer);
+    typedef void (*Utf8ToSjis)(char const* src, int bufferSize, char* dst);
+    void* _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(size_t size);
+    void _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(void* buffer);
     void _ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, uint32_t unc_size);
     FILE* FDKfopen(const char * filename, const char * mode);
     int FDKfclose(FILE* stream);
@@ -129,7 +133,7 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
         ptrdiff_t offset = returnInstructionOffset((uintptr_t)__builtin_return_address(0));
 
         if (ShinHaya_set == 1) {
-            if (offset == SH1::LogicOffset) {
+            if (offset == SH1::LogicOffset || offset == SH1::LogicGetHelp) {
                 char* checkJPN = (char*)calloc(1, bufferSize);
                 Orig(src, bufferSize, checkJPN);
 
@@ -252,6 +256,7 @@ HOOK_DEFINE_TRAMPOLINE(Wins_YesNoWindow) {
         if (string1[0]) {
             auto itr1 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string1));
             if (itr1 != YesNo.end()) string1 = itr1->ENG;
+            if (std::distance(YesNo.begin(), itr1) == 2 && string2) ((char*)(string2))[0] = 0;
         }
         if (string2[0]) {
             auto itr2 = std::find_if(YesNo.begin(), YesNo.end(), find_JPN(string2));
@@ -484,24 +489,24 @@ HOOK_DEFINE_INLINE(LoadTex_start) {
             if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
                 long com_size = 0;
                 nn::fs::GetFileSize(&com_size, filehandle);
-                void* com_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(com_size);
+                void* com_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(com_size);
                 nn::fs::ReadFile(filehandle, 0, com_buffer, com_size);
                 nn::fs::CloseFile(filehandle);
                 size_t in_size = nn::util::GetGzipDecompressedSize(com_buffer, com_size);
-                void* in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+                void* in_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(in_size);
                 char workBuffer[nn::util::DecompressGzipWorkBufferSize] = "";
                 if (nn::util::DecompressGzip(in_buffer, in_size, com_buffer, com_size, (void*)workBuffer, sizeof(workBuffer))) {
                     ctx -> X[1] = (u64)in_buffer;
                 }
-                else _ZN4Nmpl15MemoryInterface10freeMemoryEPv(in_buffer);
-                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+                else _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(in_buffer);
+                _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(com_buffer);
             }
             else {
                 filepath[strlen(filepath)-3] = 0;
                 if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
                     long in_size = 0;
                     nn::fs::GetFileSize(&in_size, filehandle);
-                    void* in_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+                    void* in_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(in_size);
                     nn::fs::ReadFile(filehandle, 0, in_buffer, in_size);
                     nn::fs::CloseFile(filehandle);
                     ctx -> X[1] = (u64)in_buffer;
@@ -531,23 +536,23 @@ bool ReplaceTexture(void** TexturePointer, uint16_t index, size_t texture_size, 
             FDKfseek(tex, 0, 2);
             long com_size = FDKftell(tex);
             FDKfseek(tex, 0, 0);
-            void* com_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(com_size);
+            void* com_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(com_size);
             FDKfread(com_buffer, com_size, 1, tex);
             FDKfclose(tex);
             
             size_t in_size = nn::util::GetGzipDecompressedSize(com_buffer, com_size);
-            *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(in_size);
+            *TexturePointer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(in_size);
             if (!*TexturePointer) {
-                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+                _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(com_buffer);
                 return false;
             }
             char workBuffer[nn::util::DecompressGzipWorkBufferSize] = "";
             if (!nn::util::DecompressGzip(*TexturePointer, in_size, com_buffer, com_size, (void*)workBuffer, sizeof(workBuffer))) {
-                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
-                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(*TexturePointer);
+                _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(com_buffer);
+                _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(*TexturePointer);
                 return false;
             }
-            _ZN4Nmpl15MemoryInterface10freeMemoryEPv(com_buffer);
+            _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(com_buffer);
 
             uint8_t* buffer = (uint8_t*)*TexturePointer;
             memcpy((void*)width, (void*)&buffer[0xC], 4);
@@ -562,7 +567,7 @@ bool ReplaceTexture(void** TexturePointer, uint16_t index, size_t texture_size, 
             filepath[strlen(filepath)-3] = 0;
             tex = FDKfopen(filepath, "rb");
             if (tex) {
-                *TexturePointer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(texture_size);
+                *TexturePointer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(texture_size);
                 FDKfseek(tex, 0xC, 0);
                 FDKfread(width, 4, 1, tex);
                 FDKfread(height, 4, 1, tex);
@@ -586,6 +591,8 @@ bool ReplaceTexture(void** TexturePointer, uint16_t index, size_t texture_size, 
 nn::os::MutexType _mutex;
 #endif
 
+std::unordered_map<XXH64_hash_t, void*> textures;
+
 HOOK_DEFINE_TRAMPOLINE(Decompress) {
     static void Callback(uint8_t* in_buffer, size_t com_size, void** out_buffer, uint32_t* unk, uint32_t unc_size) {
         #ifdef mutex_on
@@ -597,6 +604,11 @@ HOOK_DEFINE_TRAMPOLINE(Decompress) {
         auto index = compareHashes0(hash_output);
         if (ShinHaya_set) index = compareHashes1(hash_output);
         if (index.hash == hash_output) {
+            auto texture = textures.find(index.hash);
+            if (texture != textures.end()) {
+                *out_buffer = texture->second;
+                return;
+            }
             uint width = 0;
             uint height = 0;
             bool isSwizzled = false;
@@ -617,7 +629,12 @@ HOOK_DEFINE_TRAMPOLINE(Decompress) {
                 Swizzler sw = Swizzler(swWidth, index.bytesPerPixel, pow(2, index.swizzleType));
                 uint8_t* temp_buffer = (uint8_t*)*out_buffer;
                 size_t new_size = swWidth * swHeight * index.bytesPerPixel;
-                *out_buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(new_size);
+                *out_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(new_size);
+                if (!*out_buffer) {
+                    //Memory leak
+                    _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(temp_buffer);
+                    return Orig(in_buffer, com_size, out_buffer, unk, unc_size);
+                }
                 memset(*out_buffer, 0, new_size);
                 size_t offset = 0;
                 for (unsigned int y = 0; y < height; y++) {
@@ -628,7 +645,7 @@ HOOK_DEFINE_TRAMPOLINE(Decompress) {
                     }
                 }
 
-                _ZN4Nmpl15MemoryInterface10freeMemoryEPv(temp_buffer);
+                _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(temp_buffer);
                 #ifdef mutex_on
                 nn::os::UnlockMutex(&_mutex);
                 #endif
@@ -666,7 +683,7 @@ HOOK_DEFINE_INLINE(ReplaceFont) {
                     int new_size = FDKftell(tex);
                     FDKfseek(tex, 0, 0);
                     if (new_size > 5031598) {
-                        void* buffer = _ZN4Nmpl15MemoryInterface14allocateMemoryEm(new_size);
+                        void* buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(new_size);
                         ctx->X[21] = (u64)buffer;
                     }
                     tfoaf1_font_system_ptr = ctx->X[21];
@@ -675,6 +692,34 @@ HOOK_DEFINE_INLINE(ReplaceFont) {
             }
         }
         ctx -> W[8] = *(uint16_t*)(ctx -> X[21]);
+    }
+};
+
+HOOK_DEFINE_TRAMPOLINE(PhraseCtlFunc) {
+    static void Callback(void) {
+        ptrdiff_t base = NRO_Tfoaf_start + 0x11E00C4;
+        ptrdiff_t offset = 108;
+        if (ShinHaya_set == 2) {
+            base = 0;
+            offset = 0;
+        }
+        for (size_t i = 0; i < 32; i++) {
+            char* sjis_string = (char*)(base + (offset * i));
+            size_t len = strlen(sjis_string);
+            if (len > 1) {
+                char* checkJPN = (char*)calloc(1, 0x40);
+                ((SjisToUtf8)(SJIStoUTF8_origin))(sjis_string, 0x40, checkJPN);
+                auto itr = std::find_if(SH1::PhraseCtl.begin(), SH1::PhraseCtl.end(), find_JPN(checkJPN));
+                free(checkJPN);
+                if (itr != SH1::PhraseCtl.end()) {
+                    memset(sjis_string, 0, 0x40);
+                    ((Utf8ToSjis)(UTF8toSJIS_origin))(SH1::PhraseCtl[std::distance(SH1::PhraseCtl.begin(), itr)].ENG, 0x40, sjis_string);
+                }
+
+            }
+
+        }
+        return Orig();
     }
 };
 
@@ -691,6 +736,9 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
             nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13SJIStoUTF8_NXPKciPc");
             SJIStoUTF8::InstallAtPtr(pointer);
             SJIStoUTF8_origin = pointer;
+
+            nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13UTF8toSJIS_NXPKciPc");
+            UTF8toSJIS_origin = pointer;
 
             // Hook Yes/No Window to replace hardcoded text
             nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z20Wins_YesNoWindow_SetiiiPKcS0_");
@@ -717,6 +765,9 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
             //Fix drawing icons in Messages
             nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z13Wins_DrawIcon8WinsIconiiifj");
             DrawIcon::InstallAtPtr(pointer);
+
+            nn::ro::LookupModuleSymbol(&pointer, pOutModule, "_Z16PhraseCtl_Renderv");
+            PhraseCtlFunc::InstallAtPtr(pointer);
             
 
             // Find symbol to determine NRO start pointer

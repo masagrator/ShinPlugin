@@ -4,6 +4,7 @@
 
 namespace SH1 {
 	ptrdiff_t LogicOffset = 0x16810;
+	ptrdiff_t LogicGetHelp = 0x1B840;
 
 	std::array Logic_data = {
 		//Index 0
@@ -95,11 +96,13 @@ namespace SH1 {
 		Text{"遥さんにとって金谷大夢は都合のいい客だった", "To Haruka, Kanaya was a convenient customer."},
 		Text{"遥さんは金谷大夢から札束を受け取っていた", "Haruka had received a wad of cash from Kanaya."},
 		Text{"遥さんは汚物処理担当として金谷大夢に接していた", "Haruka was treating Kanaya as the one in charge of filth."},
+		Text{"遥さんは金谷大夢にダイエット薬品を渡していた", "Haruka had given diet pills to Kanaya."}, // Machine Translation
 
 		Text{"空欄のまま保留にダイエット薬品を渡していた", "Blank, Pending Investigation."},
 		Text{"ブラインドマンと金谷大夢は共犯だったていた", "The Blindman & Kanaya are accomplices."},
 		Text{"ブラインドマンは金谷大夢にダイエット薬品を渡していた", "The Blindman was giving Kanaya the Diet Pills."},
-		Text{"ブラインドマンは金谷大夢を身代わりにさせたしていた", "The Blindman had Kanaya take his place."}
+		Text{"ブラインドマンは金谷大夢を身代わりにさせたしていた", "The Blindman had Kanaya take his place."},
+		Text{"ブラインドマンと金谷大夢は生きた人間を解体していた", "The Blindman and Kanaya dismembered living humans"} // Machine Translation
 	};
 	std::span<Text> Logic(Logic_data);
 
