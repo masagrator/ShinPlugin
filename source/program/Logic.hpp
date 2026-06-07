@@ -147,8 +147,8 @@ namespace SH1 {
 	std::array LogicDescriptions_data = {
 		//Index 0
 		Text{"HoujouSaki", "Houjou Saki"},
-		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", "25 years old, a detective in Specialized Patrol Division of the C Village,"},
-		Text{"階級は巡査。", "S Prefecture Police. Rank: police officer."},
+		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", "25 years old, Specialized Patrol Division in C Village, S Prefecture."},
+		Text{"階級は巡査。", "Rank: police officer."},
 
 		Text{"黒田邦雄（くろだ・くにお）", "Kuroda Kunio"},
 		Text{"５２歳。特ラ課の上司。階級は警部。役職は課長。", "52 years old. Superior in the Special Division. Rank: Inspector."},
@@ -157,23 +157,23 @@ namespace SH1 {
 
 		Text{"風守隼人（かざもり・はやと）", "Kazamori Hayato"},
 		Text{"２８歳。特ラ課の先輩。階級は巡査部長。", "28 years old. A senior officer in the Special Investigations Unit."},
-		Text{"思った事がすぐ口に出てしまう。", " His rank is Police Sergeant. Can't help but think out loud."},
+		Text{"思った事がすぐ口に出てしまう。", "His rank is Police Sergeant. Can't help but think out loud."},
 		Text{"ホットサンドが大好物。", "Loves hot sandwiches."},
-		Text{"金谷大夢を確保する際、頸部を噛みつかれ殉職。", "He was bitten on the neck and died in the line of duty while trying to apprehend Kanaya Hiromu."},
+		Text{"金谷大夢を確保する際、頸部を噛みつかれ殉職。", "Died from a neck bite while arresting Kanaya Hiromu."},
 
 		Text{"立花美鈴（たちばな・みすず）", "Tachibana Misuzu"},
 		Text{"私の同期で鑑識課に所属。", "She is my colleague, works in the forensic department."},
 		Text{"目で見たものしか信じない現実主義者。", "A realist who only believes what she sees with her own eyes."},
 
 		Text{"関本爽二朗（せきもと・そうじろう）", "Sekimoto Soujirou"},
-		Text{"３６歳。殺人容疑で公判中の元大学教授。", "36 years old, a former university professor currently on trial for murder."},
+		Text{"３６歳。殺人容疑で公判中の元大学教授。", "A 36-year-old university ex-professor facing a murder trial."},
 		Text{"民俗学、主に都市伝説を専攻していた。", "Specialized in folklore, mainly urban legends."},
 
 		Text{"水瀬遥（みなせ・はるか）", "Minase Haruka"},
 		Text{"女子大生。", "A female university student."},
 		//Blindman
-		Text{"女子大生。首筋に生々しい青あざがある。", "A female university student. She has a vivid blue bruise on the back of her neck."},
-		Text{"生活費を稼ぐために夜のお店で働いているらしい。", "Apparently, she works at a night club to earn money for living expenses."},
+		Text{"女子大生。首筋に生々しい青あざがある。", "A female university student. She has a vivid blue bruise on her nape."},
+		Text{"生活費を稼ぐために夜のお店で働いているらしい。", "Work's a night club to make ends meet."},
 		Text{"両目を鋏で貫かれ死亡。", "She was killed when both her eyes were pierced with scissors."},
 		//Demon
 		Text{"心停止により死亡。", "Death due to cardiac arrest."},		
@@ -185,8 +185,8 @@ namespace SH1 {
 		Text{"砂堀将春の妻。", "The wife of Masaharu Sunahori."},
 
 		Text{"砂堀将春（すなほり・まさはる）", "Sunahori Masaharu"},
-		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", "The owner of Sunahori Sake Brewery, which has been making local"},
-		Text{"風守さんとは馬が合わないようだ。", "sake in Village C for generations. It seems he doesn't get along with Kazamori-san."},
+		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", "The owner of Village C's historic Sunahori Sake Brewery."},
+		Text{"風守さんとは馬が合わないようだ。", "It seems he doesn't get along with Kazamori-san."},
 
 		Text{"田村光太郎（たむら・こうたろう）", "Tamura Koutarou"},
 		Text{"銀行員。男性。３５歳。", "Bank employee. Male. 35 years old."},
@@ -201,8 +201,8 @@ namespace SH1 {
 		Text{"Ｃ村で起きていた多数の行方不明事件、", "Numerous missing persons cases occurred in Village C."},
 		Text{"その行方不明者を殺害していたという。", "It is alleged that she murdered them."},
 
-		Text{"Ｃ村の福祉施設の理事長。", "The chairman of the board of directors of a welfare facility in Village C."},
-		Text{"経営不振の責任をとって自殺したらしい。", "He apparently committed suicide to take responsibility for the company's poor performance."},
+		Text{"Ｃ村の福祉施設の理事長。", "Chairman of the board for a welfare facility in Village C."},
+		Text{"経営不振の責任をとって自殺したらしい。", "He apparently committed suicide over the company's poor performance."},
 
 		Text{"津田沼陽一（つだぬま・よういち）", "Tsudanuma Youichi"},
 		Text{"フリージャーナリスト。", "Freelance journalist."},
@@ -227,11 +227,11 @@ namespace SH1 {
 
 		Text{"金谷大夢（かなや・ひろむ）", "Kanaya Hiromu"},
 		//Blindman
-		Text{"地主の一人息子。無職。", "The only son of a landowner. Unemployed."},
+		Text{"地主の一人息子。無職。", "The landowner's unemployed son."},
 		Text{"どの捜査現場にも野次馬をしている。", "He's always there to gawk at every crime scene."},
 		Text{"遥さんと接点があるようだ。", "It seems he has some connection to Haruka."},
-		Text{"地主の一人息子。無職。どの捜査現場にも野次馬をしている。", "The only son of a landowner. Unemployed. He's always there to gawk at every crime scene."},
-		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "He had contact with Haruka and confessed to the murders of Tamura and his own family."},
+		Text{"地主の一人息子。無職。どの捜査現場にも野次馬をしている。", "The landowner's unemployed son. A perpetual crime scene gawker."},
+		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "Connected to Haruka. Confessed to killing Tamura and their family."},
 		Text{"その後、自ら舌を噛み切って死亡。", "He then bit off his own tongue and died."},
 		//Demon
 		Text{"地主の息子。", "The landowner's son."},
