@@ -33,7 +33,7 @@ namespace SH1 {
 		Text{"亘胡桃（わたり・くるみ）", "Watari Kuromi"},
 		Text{"いつも笑みを絶やさないのが魅力でもあり怖さでもある。", "Constantly smiling. Is both charming yet scary."},
 		Text{"生活費を稼ぐために夜のお店で働いているらしい。", "Work's a night club to make ends meet."},
-		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "Had a connection with Haruka. Stated they killed Tamura and their own family."},
+		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "Had a connection with Haruka. Stated he killed Tamura and his own family."},
 
 		Text{"空欄のまま保留", "Blank, Pending Investigation"},
 		Text{"関本は模範囚だ", "Sekimoto is a model prisoner."},
@@ -231,7 +231,7 @@ namespace SH1 {
 		Text{"どの捜査現場にも野次馬をしている。", "He's always there to gawk at every crime scene."},
 		Text{"遥さんと接点があるようだ。", "It seems he has some connection to Haruka."},
 		Text{"地主の一人息子。無職。どの捜査現場にも野次馬をしている。", "The landowner's unemployed son. A perpetual crime scene gawker."},
-		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "Connected to Haruka. Confessed to killing Tamura and their family."},
+		Text{"遥さんと接点があり、田村さんと自分の家族の殺害を供述。", "Connected to Haruka. Confessed to killing Tamura and his family."},
 		Text{"その後、自ら舌を噛み切って死亡。", "He then bit off his own tongue and died."},
 		//Demon
 		Text{"地主の息子。", "The landowner's son."},
