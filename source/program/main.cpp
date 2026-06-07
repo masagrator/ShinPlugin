@@ -70,7 +70,7 @@ struct find_JPN {
 	find_JPN(const char* JPN) : JPN(JPN) {}
 	bool operator () ( const Text& m ) const
 	{
-		return !strncmp(m.JPN, JPN, strlen(JPN));
+		return !memcmp(m.JPN, JPN, strlen(m.JPN)+1);
 	}
 };
 
@@ -83,6 +83,11 @@ uintptr_t gpStartArchive = 0;
 struct textureInfo {
     char reserved[200];
     int textureFormat;
+};
+
+// Define a dummy struct larger than 16 bytes to force X8 usage
+struct DummyRetStruct {
+    char dummy[24];
 };
 
 extern "C" {
@@ -101,6 +106,7 @@ extern "C" {
     int FDKfwrite(const void* ptr, int size, int count, FILE* stream);
     int FDKftell(FILE* stream);
     void cnov_swizzle_ram(void* out_buffer, void* in_buffer, uint powerOfTwoHeight, uint powerOfTwoWidth, void* unk1, void* unk2, uint bitsPerBlock);
+    DummyRetStruct _ZN4Nmpl3Gra10CGraTexMgr7loadTexEPKvPKc(void* _this, void* texture, const char* in_filepath);
 }
 
 ptrdiff_t returnInstructionOffset(uintptr_t LR) {
@@ -117,7 +123,7 @@ HOOK_DEFINE_TRAMPOLINE(CMojiFontDraw) {
 
 };
 
-bool ReplaceSJIStoUTF8(std::span<Text> Vector, const char* src, char* dst, int bufferSize, std::span<Text>::iterator itr) {
+bool ReplaceSJIStoUTF8(std::span<Text> Vector, char* dst, int bufferSize, std::span<Text>::iterator itr) {
 	if (itr != Vector.end() && strlen(itr->ENG) <= (size_t)bufferSize) {
         if (!strlen(itr->ENG))
             return false;
@@ -137,8 +143,8 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                 char* checkJPN = (char*)calloc(1, bufferSize);
                 Orig(src, bufferSize, checkJPN);
 
-                if (!ReplaceSJIStoUTF8(SH1::Logic, src, dst, bufferSize,
-                    std::find_if(SH1::Logic.begin(), SH1::Logic.end(), find_JPN(checkJPN))))
+                auto it = std::find_if(SH1::Logic.begin(), SH1::Logic.end(), find_JPN(checkJPN));
+                if (!ReplaceSJIStoUTF8(SH1::Logic, dst, bufferSize, it))
                     Orig(src, bufferSize, dst);
                 
                 free(checkJPN);
@@ -147,9 +153,9 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
             else if (offset == SH1::LogicDescriptionsOffset) {
                 char* checkJPN = (char*)calloc(1, bufferSize);
                 Orig(src, bufferSize, checkJPN);
-
-                if (!ReplaceSJIStoUTF8(SH1::LogicDescriptions, src, dst, bufferSize,
-                    std::find_if(SH1::LogicDescriptions.begin(), SH1::LogicDescriptions.end(), find_JPN(checkJPN))))
+                
+                auto it = std::find_if(SH1::LogicDescriptions.begin(), SH1::LogicDescriptions.end(), find_JPN(checkJPN));
+                if (!ReplaceSJIStoUTF8(SH1::LogicDescriptions, dst, bufferSize, it))
                     Orig(src, bufferSize, dst);
                 
                 free(checkJPN);
@@ -174,22 +180,22 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                 switch(offsetItr) {
                     case 0:
                     case 4:
-                        if (!ReplaceSJIStoUTF8(SH1::Tree2C, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH1::Tree2C, dst, bufferSize, 
                             std::find_if(SH1::Tree2C.begin(), SH1::Tree2C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 1:
-                        if (!ReplaceSJIStoUTF8(SH1::Tree4C, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH1::Tree4C, dst, bufferSize, 
                             std::find_if(SH1::Tree4C.begin(), SH1::Tree4C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 2:
-                        if (!ReplaceSJIStoUTF8(SH1::Tree8C, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH1::Tree8C, dst, bufferSize, 
                             std::find_if(SH1::Tree8C.begin(), SH1::Tree8C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 3:
-                        if (!ReplaceSJIStoUTF8(SH1::TreeCC, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH1::TreeCC, dst, bufferSize, 
                             std::find_if(SH1::TreeCC.begin(), SH1::TreeCC.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
@@ -204,7 +210,7 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                 char* checkJPN = (char*)calloc(1, bufferSize);
                 Orig(src, bufferSize, checkJPN);
 
-                if (!ReplaceSJIStoUTF8(SH2::Logic, src, dst, bufferSize,
+                if (!ReplaceSJIStoUTF8(SH2::Logic, dst, bufferSize,
                     std::find_if(SH2::Logic.begin(), SH2::Logic.end(), find_JPN(checkJPN))))
                     Orig(src, bufferSize, dst);
                 free(checkJPN);
@@ -220,22 +226,22 @@ HOOK_DEFINE_TRAMPOLINE(SJIStoUTF8) {
                 switch(offsetItr) {
                     case 0:
                     case 4:
-                        if (!ReplaceSJIStoUTF8(SH2::Tree2C, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH2::Tree2C, dst, bufferSize, 
                             std::find_if(SH2::Tree2C.begin(), SH2::Tree2C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 1:
-                        if (!ReplaceSJIStoUTF8(SH2::Tree6C, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH2::Tree6C, dst, bufferSize, 
                             std::find_if(SH2::Tree6C.begin(), SH2::Tree6C.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 2:
-                        if (!ReplaceSJIStoUTF8(SH2::TreeAC, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH2::TreeAC, dst, bufferSize, 
                             std::find_if(SH2::TreeAC.begin(), SH2::TreeAC.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
                     case 3:
-                        if (!ReplaceSJIStoUTF8(SH2::TreeEC, src, dst, bufferSize, 
+                        if (!ReplaceSJIStoUTF8(SH2::TreeEC, dst, bufferSize, 
                             std::find_if(SH2::TreeEC.begin(), SH2::TreeEC.end(), find_JPN(checkJPN))))
                             Orig(src, bufferSize, dst);
                         break;
@@ -471,10 +477,12 @@ HOOK_DEFINE_TRAMPOLINE(PutCodeTo) {
 
 };
 
-HOOK_DEFINE_INLINE(LoadTex_start) {
+std::unordered_map<std::string, void*> loadedTextures;
 
-    static void Callback(exl::hook::nx64::InlineCtx* ctx) {
-        std::string name = (const char*)(ctx -> X[2]);
+HOOK_DEFINE_TRAMPOLINE(LoadTex) {
+
+    static DummyRetStruct Callback(void* _this, void* texture, const char* in_filepath) {
+        std::string name = in_filepath;
         name = name.substr(0, name.find(".nltx"));
         char filepath[128] = "";
         nn::fs::FileHandle filehandle;
@@ -486,7 +494,11 @@ HOOK_DEFINE_INLINE(LoadTex_start) {
             nn::util::SNPrintf(filepath, sizeof(filepath), "rom0:/Tfoaf2/Textures/%s.tga.gz", name.c_str());
         }
         if (strlen(filepath) != 0) {
-            if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
+            auto it = loadedTextures.find(filepath);
+            if (it != loadedTextures.end()) {
+                texture = it->second;
+            }
+            else if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
                 long com_size = 0;
                 nn::fs::GetFileSize(&com_size, filehandle);
                 void* com_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(com_size);
@@ -496,25 +508,30 @@ HOOK_DEFINE_INLINE(LoadTex_start) {
                 void* in_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(in_size);
                 char workBuffer[nn::util::DecompressGzipWorkBufferSize] = "";
                 if (nn::util::DecompressGzip(in_buffer, in_size, com_buffer, com_size, (void*)workBuffer, sizeof(workBuffer))) {
-                    ctx -> X[1] = (u64)in_buffer;
+                    texture = in_buffer;
+                    loadedTextures[std::string(filepath)] = in_buffer;
                 }
                 else _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(in_buffer);
                 _ZN4Nmpl4Core6Memory9CGmemHeap4freeEPv(com_buffer);
             }
             else {
                 filepath[strlen(filepath)-3] = 0;
-                if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
+                auto it = loadedTextures.find(filepath);
+                if (it != loadedTextures.end()) {
+                    texture = it->second;
+                }
+                else if (R_SUCCEEDED(nn::fs::OpenFile(&filehandle, filepath, nn::fs::OpenMode_Read))) {
                     long in_size = 0;
                     nn::fs::GetFileSize(&in_size, filehandle);
                     void* in_buffer = _ZN4Nmpl4Core6Memory9CGmemHeap6mallocEm(in_size);
                     nn::fs::ReadFile(filehandle, 0, in_buffer, in_size);
                     nn::fs::CloseFile(filehandle);
-                    ctx -> X[1] = (u64)in_buffer;
+                    texture = in_buffer;
+                    loadedTextures[std::string(filepath)] = in_buffer;
                 }
             }
         }
-        ctx->X[22] = ctx->X[1];
-        return;
+        return Orig(_this, texture, filepath);
     }
 };
 
@@ -775,12 +792,14 @@ HOOK_DEFINE_TRAMPOLINE(LoadModule) {
 
             if (!strncmp(pOutModule->pathToNro, "nro/Tfoaf1.nro", strlen("nro/Tfoaf1.nro"))) {
                 ShinHaya_set = 1;
-                NRO_Tfoaf_start = pointer - 0x7000;
             }
             else {
                 ShinHaya_set = 2;
-                NRO_Tfoaf_start = pointer - 0x76E0;
             }
+            MemoryInfo meminfo;
+            u32 dummy;
+            svcQueryMemory(&meminfo, &dummy, pointer);
+            NRO_Tfoaf_start = meminfo.addr;
                 
             return ret;
     }
@@ -806,7 +825,8 @@ extern "C" void exl_main(void* x0, void* x1) {
 
     nn::fs::SetResultHandledByApplication(true);
 
-    LoadTex_start::InstallAtOffset(0x444F4);
+    //LoadTex_start::InstallAtOffset(0x444F4);
+    LoadTex::InstallAtFuncPtr(_ZN4Nmpl3Gra10CGraTexMgr7loadTexEPKvPKc);
 
     Decompress::InstallAtFuncPtr(_ZN4Nmpl4Core9CCompress7autoDecEPvjRPhRjj);
 

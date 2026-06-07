@@ -7,7 +7,7 @@ namespace SH1 {
 	ptrdiff_t LogicGetHelp = 0x1B840;
 
 	std::array Logic_data = {
-		//Index 0
+		//Index 0 - Common and Blindman
 		Text{"田村光太郎（たむら・こうたろう）", "Tamura Koutarou"},
 		Text{"両目を鋏で貫かれ殺害された。", "Murdered. Scissors were used to gouge his eyes."},
 		Text{"水瀬遥（みなせ・はるか）", "Minase Haruka"},
@@ -102,7 +102,50 @@ namespace SH1 {
 		Text{"ブラインドマンと金谷大夢は共犯だったていた", "The Blindman & Kanaya are accomplices."},
 		Text{"ブラインドマンは金谷大夢にダイエット薬品を渡していた", "The Blindman was giving Kanaya the Diet Pills."},
 		Text{"ブラインドマンは金谷大夢を身代わりにさせたしていた", "The Blindman had Kanaya take his place."},
-		Text{"ブラインドマンと金谷大夢は生きた人間を解体していた", "The Blindman and Kanaya dismembered living humans"} // Machine Translation
+		Text{"ブラインドマンと金谷大夢は生きた人間を解体していた", "The Blindman and Kanaya dismembered living humans"}, // Machine Translation
+
+		//Index 1 - Demon // All below is a Machine Translation
+		Text{"亡くなった人達は遥さんの金づるだった", "The people who died were Ms. Haruka cash cows."},
+		Text{"遥さんと亡くなった人達はカップルだった", "The people who died were in close relationship with Ms. Haruka."},
+		Text{"遥さんと亡くなった人達は友達同士だった", "The people who died were friends with Ms. Haruka."},
+		Text{"遥さんにとって亡くなった人達は親しい相手だった", "The people who died were partners for Ms. Haruka."},
+		Text{"遥さんにとって亡くなった人達は友達の友達だった", "The people who died were friends of friends for Ms. Haruka."},
+
+		Text{"美鈴にも黒いもやの心霊現象が見えていた", "Misuzu could also see the paranormal phenomenon of a black haze."},
+		Text{"美鈴は呪いの解除法を知っている", "Misuzu knows how to break the curse."},
+		Text{"美鈴は何らかの禁忌を犯している", "Misuzu has committed some kind of taboo."},
+		Text{"美鈴の旧姓は赤川だ", "Misuzu's maiden name was Akagawa."},
+		Text{"美鈴は死神だ", "Misuzu is a grim reaper."},
+
+		Text{"美鈴と遥さんは高校時代からの同級生だ", "Misuzu and Haruka have been classmates in high school."},
+		Text{"美鈴と遥さんは中学時代からの同級生だ", "Misuzu and Haruka have been classmates from middle school."},
+		Text{"美鈴と遥さんは赤の他人だ", "Misuzu and Haruka are complete strangers."},
+		Text{"美鈴と遥さんは警察学校で同期だった", "Misuzu and Haruka were classmates at the police academy."},
+		Text{"美鈴と遥さんは修学旅行を共にしていた", "Misuzu and Haruka were on the school trip together."},
+
+		Text{"私は一連の事件が偶然の事故だと思っている", "I believe that this series of incidents was accidental."},
+		Text{"私は一連の事件が何らかの呪いのせいだと思っている", "I believe this series of events is due to some kind of curse."},
+		Text{"私は心霊写真を撮ったことがある", "I have taken a photo of a ghost."},
+		Text{"私には虚言癖がある", "I have a tendency to lie."},
+		Text{"私は疲れて幻覚を見るようになった", "I became tired and started having hallucinations."},
+
+		Text{"私は美鈴を恩人だと思っている", "I consider Misuzu to be my benefactor."},
+		Text{"私は美鈴を友達だと思っている", "I consider Misuzu to be my friend."},
+		Text{"私と美鈴はドライな関係だ", "Misuzu and I have a detached relationship."},
+		Text{"私と美鈴は高校時代の同級生だった", "Misuzu and I were classmates in high school."},
+		Text{"私と美鈴はバイト先の同僚だった", "Misuzu and I were colleagues at our part-time job."},
+
+		Text{"私は遥さんを同類だと思っている", "I see Haruka as someone just like me."},
+		Text{"私は遥さんを友達だと思っている", "I consider Haruka to be a friend."},
+		Text{"私と遥さんは顔見知り程度の関係だ", "Haruka and I are only acquaintances."},
+		Text{"私は遥さんの中学時代のクラスメイトだ", "I was Haruka's classmate from middle school."},
+		Text{"私は遥さんを死神だと思っている", "I think Haruka is a grim reaper."},
+
+		Text{"遥さんは短大生だ", "Haruka is a junior college student."},
+		Text{"遥さんはいたずらメールを送っている", "Haruka is behind prank calls."},
+		Text{"遥さんはストーカーに悩まされている", "Haruka is being harassed by a stalker."},
+		Text{"遥さんには黒いもやが見える", "Haruka can see a black haze."},
+		Text{"遥さんが今まで生きていたのは奇跡だ", "It’s a miracle Haruka lived as long as she did."},
 	};
 	std::span<Text> Logic(Logic_data);
 
@@ -111,81 +154,91 @@ namespace SH1 {
 	std::array LogicDescriptions_data = {
 		//Index 0
 		Text{"HoujouSaki", "Houjou Saki"},
-		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", ""},
-		Text{"階級は巡査。", ""},
+		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", "25 years old, a detective in Specialized Patrol Division of the C Village,"},
+		Text{"階級は巡査。", "S Prefecture Police. Rank: police officer."},
 
 		Text{"黒田邦雄（くろだ・くにお）", "Kuroda Kunio"},
-		Text{"５２歳。特ラ課の上司。階級は警部。役職は課長。", ""},
-		Text{"いつも笑みを絶やさないのが魅力でもあり怖さでもある。", ""},
+		Text{"５２歳。特ラ課の上司。階級は警部。役職は課長。", "52 years old. Superior in the Special Division. Rank: Inspector."},
+		Text{"いつも笑みを絶やさないのが魅力でもあり怖さでもある。", "Position: Division Chief. His smile is both charming and frightening."},
 
 		Text{"風守隼人（かざもり・はやと）", "Kazamori Hayato"},
-		Text{"２８歳。特ラ課の先輩。階級は巡査部長。", ""},
-		Text{"思った事がすぐ口に出てしまう。", ""},
-		Text{"ホットサンドが大好物。", ""},
+		Text{"２８歳。特ラ課の先輩。階級は巡査部長。", "28 years old. A senior officer in the Special Investigations Unit."},
+		Text{"思った事がすぐ口に出てしまう。", " His rank is Police Sergeant. Tends to blurt out whatever"},
+		Text{"ホットサンドが大好物。", "he is thinking right away. Loves hot sandwiches."},
 
 		Text{"立花美鈴（たちばな・みすず）", "Tachibana Misuzu"},
-		Text{"私の同期で鑑識課に所属。", ""},
-		Text{"目で見たものしか信じない現実主義者。", ""},
+		Text{"私の同期で鑑識課に所属。", "She is my colleague, works in the forensic department."},
+		Text{"目で見たものしか信じない現実主義者。", "A realist who only believes what she sees with her own eyes."},
 
 		Text{"関本爽二朗（せきもと・そうじろう）", "Sekimoto Soujirou"},
-		Text{"３６歳。殺人容疑で公判中の元大学教授。", ""},
-		Text{"民俗学、主に都市伝説を専攻していた。", ""},
+		Text{"３６歳。殺人容疑で公判中の元大学教授。", "36 years old, a former university professor currently on trial"},
+		Text{"民俗学、主に都市伝説を専攻していた。", "for murder. Specialized in folklore, mainly urban legends."},
 
 		Text{"水瀬遥（みなせ・はるか）", "Minase Haruka"},
-		Text{"女子大生。首筋に生々しい青あざがある。", ""},
-		Text{"生活費を稼ぐために夜のお店で働いているらしい。", ""},
+		//Blindman
+		Text{"女子大生。首筋に生々しい青あざがある。", "A female university student. She has a vivid blue bruise on the back of her neck."},
+		Text{"生活費を稼ぐために夜のお店で働いているらしい。", "Apparently, she works at a night club to earn money for living expenses."},
+		//Demon
+		Text{"女子大生。", "A female university student."},
+		Text{"心停止により死亡。", "Death due to cardiac arrest."},		
 
 		Text{"砂堀聡史（すなほり・さとし）", "Sunahori Satoshi"},
-		Text{"砂堀酒造の息子。", ""},
+		Text{"砂堀酒造の息子。", "The son of the owner of Sunahori Sake Brewery."},
 
 		Text{"砂堀優子（すなほり・ゆうこ）", "Sunahori Yuuko"},
-		Text{"砂堀将春の妻。", ""},
+		Text{"砂堀将春の妻。", "The wife of Masaharu Sunahori."},
 
 		Text{"砂堀将春（すなほり・まさはる）", "Sunahori Masaharu"},
-		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", ""},
-		Text{"風守さんとは馬が合わないようだ。", ""},
+		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", "The owner of Sunahori Sake Brewery, which has been making local sake in Village C for generations."},
+		Text{"風守さんとは馬が合わないようだ。", "It seems he doesn't get along with Kazamori-san."},
 
 		Text{"田村光太郎（たむら・こうたろう）", "Tamura Koutarou"},
-		Text{"銀行員。男性。３５歳。", ""},
-		Text{"両目を鋏で貫かれ殺害された。", ""},
-		Text{"各方面でトラブルの種を抱えていたようだ。", ""},
+		Text{"銀行員。男性。３５歳。", "Bank employee. Male. 35 years old."},
+		//Blindman
+		Text{"両目を鋏で貫かれ殺害された。", "He was killed when both his eyes were pierced with scissors."},
+		Text{"各方面でトラブルの種を抱えていたようだ。", "It seems he was harboring trouble in various areas."},
+		//Demon
+		Text{"死因は心停止。", "The cause of death was cardiac arrest."},
 
 		Text{"牧村早苗（まきむら・さなえ）", "Makimura Sanae"},
-		Text{"Ｃ村の福祉施設に勤める介護学生。", ""},
-		Text{"Ｃ村で起きていた多数の行方不明事件、", ""},
-		Text{"その行方不明者を殺害していたという。", ""},
+		Text{"Ｃ村の福祉施設に勤める介護学生。", "A nursing student working at a welfare facility in Village C."},
+		Text{"Ｃ村で起きていた多数の行方不明事件、", "Numerous missing persons cases occurred in Village C."},
+		Text{"その行方不明者を殺害していたという。", "It is alleged that she murdered them."},
 
-		Text{"Ｃ村の福祉施設の理事長。", ""},
-		Text{"経営不振の責任をとって自殺したらしい。", ""},
+		Text{"Ｃ村の福祉施設の理事長。", "The chairman of the board of directors of a welfare facility in Village C."},
+		Text{"経営不振の責任をとって自殺したらしい。", "He apparently committed suicide to take responsibility for the company's poor performance."},
 
 		Text{"津田沼陽一（つだぬま・よういち）", "Tsudanuma Youichi"},
-		Text{"フリージャーナリスト。", ""},
+		Text{"フリージャーナリスト。", "Freelance journalist."},
 
 		Text{"亘胡桃（わたり・くるみ）", "Watari Kuromi"},
-		Text{"７８歳。福祉施設を住所とする老婆。", ""},
-		Text{"両目に鋏を突き刺され死亡。", ""},
+		Text{"７８歳。福祉施設を住所とする老婆。", "A 78-year-old woman who lives in a welfare facility."},
+		Text{"両目に鋏を突き刺され死亡。", "She died after scissors were thrust into both of her eyes."},
 
 		Text{"竹中浩三（たけなか・こうぞう）", "Takenaka Kouzou"},
-		Text{"５８歳。竹中慎一郎の父。", ""},
-		Text{"遺体となって発見された。", ""},
+		Text{"５８歳。竹中慎一郎の父。", "58 years old. Father of Shinichiro Takenaka."},
+		Text{"遺体となって発見された。", "His body was discovered."},
 
 		Text{"竹中千鶴子（たけなか・ちづこ）", "Takenaka Chizuko"},
-		Text{"５５歳。竹中慎一郎の母。", ""},
-		Text{"遺体となって発見された。", ""},
+		Text{"５５歳。竹中慎一郎の母。", "55 years old. Shinichiro Takenaka's mother."},
+		Text{"遺体となって発見された。", "His body was discovered."},
 
 		Text{"竹中慎一郎（たけなか・しんいちろう）", "Takenaka Shinichirou"},
-		Text{"２８歳。関本の下に在籍していた元研究員。", ""},
-		Text{"現在の職業は不詳。", ""},
-		Text{"両親と共に遺体となって発見された。", ""},
+		Text{"２８歳。関本の下に在籍していた元研究員。", "28 years old. A former researcher who worked under Sekimoto."},
+		Text{"現在の職業は不詳。", "Current occupation is unknown."},
+		Text{"両親と共に遺体となって発見された。", "He was found dead along with his parents."},
 
 		Text{"金谷大夢（かなや・ひろむ）", "Kanaya Hiromu"},
-		Text{"地主の一人息子。無職。", ""},
-		Text{"どの捜査現場にも野次馬をしている。", ""},
-		Text{"遥さんと接点があるようだ。", ""},
+		//Blindman
+		Text{"地主の一人息子。無職。", "The only son of a landowner. Unemployed."},
+		Text{"どの捜査現場にも野次馬をしている。", "He's always there to gawk at every crime scene."},
+		Text{"遥さんと接点があるようだ。", "It seems he has some connection to Haruka."},
+		//Demon
+		Text{"地主の息子。", "The landowner's son."},
 
 		Text{"ブラインドマン", "Blindman"},
-		Text{"都市伝説に登場する架空の人物。", ""},
-		Text{"『光を奪う者』という意味を込めて名付けられたらしい。", ""}
+		Text{"都市伝説に登場する架空の人物。", "A fictional character appearing in urban legends."},
+		Text{"『光を奪う者』という意味を込めて名付けられたらしい。", "It seems the name was chosen to mean \"the one who steals the light.\""}
 	};
 
 	std::span<Text> LogicDescriptions(LogicDescriptions_data);

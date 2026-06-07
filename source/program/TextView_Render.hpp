@@ -7,7 +7,8 @@ namespace SH1 {
         0x46F94, //FOAF popup
         0x4E6A4, //Animated Text
         0x4EFAC, //Static Text
-        0x36490  //Tutorial Select
+        0x36490, //Tutorial Select
+		0x63A68, //Phrases ("To Verify 1", etc)
     };
 
     // Those offsets are used for Ruby to calculate middle of text
