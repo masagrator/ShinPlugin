@@ -79,7 +79,7 @@ namespace SH1 {
 
 		Text{"津田沼さんはスクープを欲しがっている", "Tsudanuma wants the scoop."},
 		Text{"津田沼さんはジャーナリズムを大切にしている",  "Tsudanuma values journalism."},
-		Text{"津田沼さんはプロポーズをするつもりだいる", "Tsudanuma is planning to propose."},
+		Text{"津田沼さんはプロポーズをするつもりだ", "Tsudanuma wants to propose."},
 
 		Text{"金谷大夢は善良な市民だ", "Kanaya Hiromu is a good citizen."},
 		Text{"金谷大夢は偉大なる小説家だ", "Kanaya Hiromu is a great novelist."},
@@ -149,25 +149,41 @@ namespace SH1 {
 		Text{"HoujouSaki", "Houjou Saki"},
 		Text{"２５歳。Ｓ県警Ｃ村分署特殊警ら課に所属している刑事。", "25 years old, Specialized Patrol Division in C Village, S Prefecture."},
 		Text{"階級は巡査。", "Rank: police officer."},
+		//Rest
+		Text{"関本殺害容疑をかけられ逮捕される。", ""},
 
 		Text{"黒田邦雄（くろだ・くにお）", "Kuroda Kunio"},
 		Text{"５２歳。特ラ課の上司。階級は警部。役職は課長。", "52 years old. Superior in the Special Division. Rank: Inspector."},
 		Text{"いつも笑みを絶やさないのが魅力でもあり怖さでもある。", "Position: Division Chief. Constantly smiling. Is both charming yet scary."},
 		Text{"ボックスカーごと崖下へ転落し死亡。", "Died in car that fell off the cliff."},
+		//Rest
+		Text{"感染した美鈴に噛まれて死亡。", ""},
+		Text{"感染した美鈴に噛まれて、感染者になる。", ""},
+		Text{"一連の犯行は課長が仕組んだことなのか？", ""},
 
 		Text{"風守隼人（かざもり・はやと）", "Kazamori Hayato"},
 		Text{"２８歳。特ラ課の先輩。階級は巡査部長。", "28 years old. A senior officer in the Special Investigations Unit."},
 		Text{"思った事がすぐ口に出てしまう。", "His rank is Police Sergeant. Can't help but think out loud."},
 		Text{"ホットサンドが大好物。", "Loves hot sandwiches."},
 		Text{"金谷大夢を確保する際、頸部を噛みつかれ殉職。", "Died from a neck bite while arresting Kanaya Hiromu."},
+		Text{"旅館の離れで、金谷たちに解体された状態で発見。", ""},
+		Text{"特ラ課の先輩。階級は巡査部長。", "A senior officer in the Special Investigations Unit."},
 
 		Text{"立花美鈴（たちばな・みすず）", "Tachibana Misuzu"},
 		Text{"私の同期で鑑識課に所属。", "She is my colleague, works in the forensic department."},
 		Text{"目で見たものしか信じない現実主義者。", "A realist who only believes what she sees with her own eyes."},
+		//Rest
+		Text{"Ｃ村入り口のトンネル付近で感染者となる。", ""},
+		Text{"黒田課長が美鈴に何かした？", ""},
+		Text{"キャタピラーの機密保持のため消される。", ""},
+		Text{"署内の休憩室で殺害される。", ""},
 
 		Text{"関本爽二朗（せきもと・そうじろう）", "Sekimoto Soujirou"},
 		Text{"３６歳。殺人容疑で公判中の元大学教授。", "A 36-year-old university ex-professor facing a murder trial."},
 		Text{"民俗学、主に都市伝説を専攻していた。", "Specialized in folklore, mainly urban legends."},
+		//Rest
+		Text{"本人は警察の人間だというが、真偽は不明。", ""},
+		Text{"Ｃ村分署の留置所で死亡。", ""},
 
 		Text{"水瀬遥（みなせ・はるか）", "Minase Haruka"},
 		Text{"女子大生。", "A female university student."},
@@ -176,17 +192,31 @@ namespace SH1 {
 		Text{"生活費を稼ぐために夜のお店で働いているらしい。", "Work's a night club to make ends meet."},
 		Text{"両目を鋏で貫かれ死亡。", "She was killed when both her eyes were pierced with scissors."},
 		//Demon
-		Text{"心停止により死亡。", "Death due to cardiac arrest."},		
+		Text{"心停止により死亡。", "Death due to cardiac arrest."},	
+		//Rest
+		Text{"女子大生。旅館でアルバイトをしている。", ""},
+		Text{"ロープで首を吊って死亡。", ""},
+		Text{"クラブでアルバイトをしている。", ""},
 
 		Text{"砂堀聡史（すなほり・さとし）", "Sunahori Satoshi"},
 		Text{"砂堀酒造の息子。", "The son of the owner of Sunahori Sake Brewery."},
+		Text{"砂堀酒造の息子として育てられている。", ""},
+		Text{"感染症状が現われている。", ""},
+		Text{"頭を叩き割られて死亡。", ""},
 
 		Text{"砂堀優子（すなほり・ゆうこ）", "Sunahori Yuuko"},
 		Text{"砂堀将春の妻。", "The wife of Masaharu Sunahori."},
+		//Rest
+		Text{"砂堀将春の妻。旅館で働いている。", ""},
+		Text{"警察署内の仮眠室で死亡。", ""},//Repeats for whole family
+		Text{"キャタピラーの被害に遭って死亡。", ""}, //Repeats for whole family
+		Text{"酒蔵の中で死亡が確認される。", ""}, //Repeats for whole family
 
 		Text{"砂堀将春（すなほり・まさはる）", "Sunahori Masaharu"},
 		Text{"Ｃ村で代々地酒造りを営む砂堀酒造の大将。", "The owner of Village C's historic Sunahori Sake Brewery."},
 		Text{"風守さんとは馬が合わないようだ。", "It seems he doesn't get along with Kazamori-san."},
+		//Rest
+		Text{"バイオ方面の研究に熱心で、醤油など他の商品も作っている。", ""},
 
 		Text{"田村光太郎（たむら・こうたろう）", "Tamura Koutarou"},
 		Text{"銀行員。男性。３５歳。", "Bank employee. Male. 35 years old."},
@@ -195,21 +225,38 @@ namespace SH1 {
 		Text{"各方面でトラブルの種を抱えていたようだ。", "It seems he was harboring trouble in various areas."},
 		//Demon
 		Text{"死因は心停止。", "The cause of death was cardiac arrest."},
+		//Rest
+		Text{"銀行員。男性。３５歳。両目を鋏で貫かれ殺害された。", ""},
+		Text{"犯人は金谷たちである可能性が高い。", ""},
 
 		Text{"牧村早苗（まきむら・さなえ）", "Makimura Sanae"},
 		Text{"Ｃ村の福祉施設に勤める介護学生。", "A nursing student working at a welfare facility in Village C."},
 		Text{"Ｃ村で起きていた多数の行方不明事件、", "Numerous missing persons cases occurred in Village C."},
 		Text{"その行方不明者を殺害していたという。", "It is alleged that she murdered them."},
+		Text{"感染した亘さんに噛まれて、感染者になる。", ""},
 
 		Text{"Ｃ村の福祉施設の理事長。", "Chairman of the board for a welfare facility in Village C."},
 		Text{"経営不振の責任をとって自殺したらしい。", "He apparently committed suicide over the company's poor performance."},
 
 		Text{"津田沼陽一（つだぬま・よういち）", "Tsudanuma Youichi"},
 		Text{"フリージャーナリスト。", "Freelance journalist."},
+		//Rest
+		Text{"砂堀酒造の酒蔵の地下で死亡。", ""},
+		Text{"金谷と共謀している。", ""},
+		Text{"感染者に噛まれて、金谷さんに殺される。", ""},
+		Text{"感染者に噛まれる。", ""},
+		Text{"両目をハサミで潰された状態の遺体で発見される。", ""},
 
 		Text{"亘胡桃（わたり・くるみ）", "Watari Kuromi"},
 		Text{"７８歳。福祉施設を住所とする老婆。", "A 78-year-old woman who lives in a welfare facility."},
 		Text{"両目に鋏を突き刺され死亡。", "She died after scissors were thrust into both of her eyes."},
+		//Rest
+		Text{"旅館のお得意様。", ""},
+		Text{"介護施設で牧村さんの世話を受けている。", ""},
+		Text{"感染者に噛まれていたらしい。", ""},
+		Text{"夜の山道にて心不全で亡くなる。", ""},
+		Text{"地元では有名人だったらしい。", ""},
+		Text{"秘密クラブ『男の楽園ＮＫＰ』のオーナー。", ""},
 
 		Text{"竹中浩三（たけなか・こうぞう）", "Takenaka Kouzou"},
 		Text{"５８歳。竹中慎一郎の父。", "58 years old. Father of Shinichiro Takenaka."},
@@ -235,10 +282,35 @@ namespace SH1 {
 		Text{"その後、自ら舌を噛み切って死亡。", "He then bit off his own tongue and died."},
 		//Demon
 		Text{"地主の息子。", "The landowner's son."},
+		//Rest
+		Text{"旅館のオーナー。", ""}, //Repeats
+		Text{"津田沼と共謀している。", ""},
+		Text{"介護施設で感染した牧村さんに殺される。", ""},
+		Text{"金谷家の天井裏にいた虫たちに襲われて死亡。", ""},
+		Text{"金谷家で存命。助けを求めてくる。", ""},
 
 		Text{"ブラインドマン", "Blindman"},
 		Text{"都市伝説に登場する架空の人物。", "A fictional character appearing in urban legends. It seems"},
-		Text{"『光を奪う者』という意味を込めて名付けられたらしい。", "the name was chosen to mean \"the one who steals the light.\""}
+		Text{"『光を奪う者』という意味を込めて名付けられたらしい。", "the name was chosen to mean \"the one who steals the light.\""},
+
+		Text{"製薬研究所の爆破事故が原因で拡大。", ""},
+		Text{"異常な腕力を持つ。", ""},
+		Text{"噛まれると感染者になる。", ""},
+		Text{"金谷家の床下から発見された。", ""},
+		Text{"調査チームからはモンスターと恐れられている。", ""},
+		Text{"正式な手続きなしで金谷家に現われた集団。", ""},
+		Text{"全身を防護服で包んでいる。", ""},
+
+		Text{"砂堀（すなほり）", ""},
+		Text{"秘密クラブ『男の楽園ＮＫＰ』のマネージャー。", ""},
+
+		Text{"優子ママ（ゆうこママ）", ""},
+		Text{"秘密クラブ『男の楽園ＮＫＰ』で働くママ。", ""},
+		Text{"タスマニアに別荘があるらしい。", ""},
+
+		Text{"ヒロムたん", ""},
+		Text{"秘密クラブ『男の楽園ＮＫＰ』の常連客。", ""},
+		Text{"遥さんのことがお気に入りのようだ。", ""}
 	};
 
 	std::span<Text> LogicDescriptions(LogicDescriptions_data);
